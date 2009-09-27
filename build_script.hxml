@@ -1,0 +1,4 @@
+-php .\script
+-main hails.script.Main
+-cp .
+-prompt

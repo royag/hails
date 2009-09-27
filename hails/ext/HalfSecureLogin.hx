@@ -14,6 +14,9 @@ import hails.util.DynamicUtil;
 import haxe.Md5;
 
 /**
+ * ! TODO: This actually uses JQuery javascript library, and some untyped functions.
+ * Of course: We'd like to use pure haxe...
+ * 
  * Contains methods for serverside PHP(/Neko) and clientside JavaScript
  * to help communicating passwords over the wire, without sending passwords in cleartext.
  * 

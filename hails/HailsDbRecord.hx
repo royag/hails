@@ -6,7 +6,6 @@
 package hails;
 
 import config.DatabaseConfig;
-import controller.UserController;
 import hails.util.StringUtil;
 import php.db.Connection;
 import php.db.Object;
