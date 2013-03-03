@@ -1,14 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<project>
+<project version="2">
   <!-- Output SWF options -->
   <output>
-    <movie disabled="True" />
+    <movie outputType="OtherIDE" />
     <movie input="" />
     <movie path="" />
     <movie fps="30" />
     <movie width="400" />
     <movie height="400" />
-    <movie version="11" />
+    <movie version="0" />
+    <movie minorVersion="0" />
+    <movie platform="JavaScript" />
     <movie background="#FFFFFF" />
   </output>
   <!-- Other classes to be compiled into your SWF -->
@@ -20,8 +22,7 @@
     <option directives="" />
     <option flashStrict="False" />
     <option mainClass="" />
-    <option override="False" />
-    <option verbose="False" />
+    <option enabledebug="False" />
     <option additional="" />
   </build>
   <!-- haxelib libraries -->
@@ -45,4 +46,6 @@
     <option showHiddenPaths="False" />
     <option testMovie="NewTab" />
   </options>
+  <!-- Plugin storage -->
+  <storage />
 </project>

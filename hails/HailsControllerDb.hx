@@ -12,10 +12,10 @@ class HailsControllerDb extends HailsController {
 	}
 	
 	public function findBy < T > (c:Class < T > , field:String, val:Dynamic) : List < T > {
-		return HailsDbRecord.findBy(c, field, val);
+		return HailsDbRecord.findByType(c, field, val);
 	}
 	
 	public function findAll < T > (c:Class < T > ) : List < T > {
-		return HailsDbRecord.findAll(c);
+		return HailsDbRecord.findAllType(c);
 	}
 }

@@ -94,7 +94,7 @@ class AjaxTable /*implements HtmlElem*/
 		}*/
 		//trace(conds);
 		//trace(conds);
-		return HailsDbRecord.findAll(modelClass, 
+		return HailsDbRecord.findAllType(modelClass, 
 			{limit:limit, order:order, conditions:conds, join:join, include:include, select:select} );
 	}
 	

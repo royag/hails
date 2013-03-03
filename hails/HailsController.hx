@@ -150,7 +150,7 @@ class HailsController extends HailsBaseController
 			maxSize -= len;
 			if( maxSize < 0 )
 				throw "Maximum size reached";
-			buf.addSub(str,pos,len);
+			buf.addSub(str.toString(),pos,len);
 		});
 		if( curname != null )
 			h.set(curname,buf.toString());

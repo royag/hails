@@ -6,6 +6,7 @@
 package hails;
 
 import config.DatabaseConfig;
+//import controller.UserController;
 import hails.util.StringUtil;
 import php.db.Connection;
 import php.db.Object;
@@ -96,7 +97,7 @@ class HailsDbRecord extends hails.HailsBaseRecord {
 	}
 	
 	public static function findById < T > (c:Class < T > , id:Dynamic) : T {
-		var recs:List < T > = findBy(c, "id", id);
+		var recs:List < T > = findByType(c, "id", id);
 		if (recs != null) {
 			return recs.first();
 		}  else {
@@ -104,11 +105,11 @@ class HailsDbRecord extends hails.HailsBaseRecord {
 		}
 	}
 	
-	public static function findBy < T > (c:Class < T > , field:String, val:Dynamic) : List < T > {
+	public static function findByType < T > (c:Class < T > , field:String, val:Dynamic) : List < T > {
 		//trace("      VAL = ");
 		//trace(val.toString());
 		var op:String = " = ";
-		if (Type.typeof(val) == TClass(String)) {
+		if (Std.is(val,String)) {
 			var s:String = val;
 			if (StringTools.startsWith(s, '%') || StringTools.endsWith(s, '%')) {
 				op = " LIKE ";
@@ -116,7 +117,7 @@ class HailsDbRecord extends hails.HailsBaseRecord {
 		}
 		// val.toString() works with haxe 2.01 but not with haxe 2.02
 		var cond = [field + op + '?', val]; // "'" + val /*.toString()*/ + "'"; 
-		return findAll(c, {conditions:cond});				
+		return findAllType(c, {conditions:cond});				
 	}
 	
 	static function createWhere(options:Dynamic, conn:Connection) : String {
@@ -249,7 +250,7 @@ class HailsDbRecord extends hails.HailsBaseRecord {
 		return count;
 	}
 	
-	public static function findAll < T > (c:Class < T >, ?options:Dynamic, ?conn:Connection ) : List < T > {
+	public static function findAllType < T > (c:Class < T >, ?options:Dynamic, ?conn:Connection ) : List < T > {
 		var hadConn = (conn != null);
 		var error:Dynamic = null;
 		var ret:List<T> = new List<T>();
@@ -287,7 +288,7 @@ class HailsDbRecord extends hails.HailsBaseRecord {
 	
 	public static function findAssociated < T , U > (rec:T, hasMany:Class < U > ) : List<U> {
 		var foreignKey:String = tableNameForClass(Type.getClass(rec)) + "_id";
-		return findBy(hasMany, foreignKey, Reflect.field(rec, "id"));
+		return findByType(hasMany, foreignKey, Reflect.field(rec, "id"));
 	}
 	
 	public function findAssociatedRecords<U>(hasMany:Class < U > ) : List < U > {

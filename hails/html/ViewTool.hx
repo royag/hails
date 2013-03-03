@@ -28,7 +28,8 @@ class ViewTool
 		formatDate : _formatDate,
 		inputDateFor : _inputDateFor,
 		formatDateDefault : _formatDateDefault,
-		formatDateTimeDefault : _formatDateTimeDefault
+		formatDateTimeDefault : _formatDateTimeDefault,
+		urlEncode : _urlEncode
 	};
 	
 	public static function link(path:String, content:String) : String {
@@ -230,6 +231,9 @@ class ViewTool
 	}
 	public static function _formatDate(resolve : String -> Dynamic, d:Dynamic, format:String) : String {
 		return formatDate(d, format);
+	}
+	public static function _urlEncode(resolve : String -> Dynamic, str:String) : String {
+		return StringTools.urlEncode(str);
 	}
 	public static function formatDate(d:Dynamic, format:String) : String {
 		var theDate:Date = d;
