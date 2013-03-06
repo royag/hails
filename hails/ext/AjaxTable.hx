@@ -10,6 +10,7 @@ import hails.html.ViewTool;
 import hails.util.DynamicUtil;
 import hails.util.StringUtil;
 import hails.util.TypeUtil;
+import haxe.ds.StringMap;
 
 	typedef ControllerAction = {
 		controller:String,
@@ -393,12 +394,12 @@ class AjaxTable /*implements HtmlElem*/
 	 * @param	Hash < String >
 	 * @return
 	 */
-	public function doAjaxEdit(params : Hash < String > ) : String {
+	public function doAjaxEdit(params : StringMap < String > ) : String {
 		return "$('#"+params.get('rowid')+"').html(\"" +
 			StringTools.replace(loadOneRow(Std.parseInt(params.get('id')), true),'"','\\"') + "\")";
 	}
 	
-	public function doAjaxDelete(params : Hash < String > ):String {
+	public function doAjaxDelete(params : StringMap < String > ):String {
 		var rowid = params.get('rowid');
 		var idparam = params.get('id');
 		var rec:HailsDbRecord = HailsDbRecord.findById(modelClass, idparam);
@@ -415,7 +416,7 @@ class AjaxTable /*implements HtmlElem*/
 	 * @param	params
 	 * @return
 	 */
-	public function doAjaxSave(params : Hash < String > , ?extraValues : Dynamic ) : String {
+	public function doAjaxSave(params : StringMap < String > , ?extraValues : Dynamic ) : String {
 		var rowid = params.get('rowid');
 		var idparam = params.get('id');
 		var isNew = idparam == '0';

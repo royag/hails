@@ -12,7 +12,7 @@ enum ApplicationControllers {
 }
 
 class HailsConfig {
-	public static var phpViewRoot = "C:/projects/hails_google/view";
+	public static var phpViewRoot = "/personal/google_code/hails/view";
 	
 	public static function getLogFileName() : String {
 		return "C:/projects/hails_google/hails.log";

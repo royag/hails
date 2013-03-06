@@ -111,8 +111,7 @@ class RtfParser extends StringReader
 			cnt += 1;
 			nextType = getNextType();
 			//trace(nextType);
-			switch (nextType) {
-				case BLOCK_START : {
+				if (nextType == BLOCK_START) {
 					//trace("BLOCKSTART<br>");
 					tmp = readBlock();
 					elems.add(tmp);
@@ -121,7 +120,7 @@ class RtfParser extends StringReader
 						default : {}
 					}
 				}
-				case BLOCK_END : {
+				else if (nextType == BLOCK_END)  {
 					//trace("BLOCKEND<br>");
 					skip();
 					//skipOneBlank();
@@ -130,7 +129,7 @@ class RtfParser extends StringReader
 					}
 					return rtf_block(elems);
 				}
-				case TAG : {
+				else if (nextType ==  TAG)  {
 					tmp = readTag();
 					elems.add(tmp);
 					switch (tmp) {
@@ -149,16 +148,15 @@ class RtfParser extends StringReader
 						skipOneBlank(); // Blanks(); // OneBlank();
 					}
 				}
-				case TEXT : {
+				else if (nextType ==  TEXT) {
 					if (lastWasMetaBlock) {
 						elems.add(readTextAfterMeta());
 					} else {
 						elems.add(readText());
 					}
 				}
-				case EOF : return null; // throw "END OF FILE reached";
-				default : throw "Unknown type: " + nextType + " at pos " + pos;
-			}
+				else if (nextType ==  EOF) { return null; }// throw "END OF FILE reached";}
+				else { throw "Unknown type: " + nextType + " at pos " + pos; }
 			if (pos == lastPos) {
 				throw "Parse-Error: Possible Infinite loop detected at pos " + pos + ": " + 
 					data.substr(pos-10,10) + '|HERE|' + data.substr(pos,10);

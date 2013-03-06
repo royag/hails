@@ -7,7 +7,7 @@ package hails.ext.text;
 
 import hails.ext.text.RtfElem;
 import hails.html.ViewTool;
-import haxe.Stack;
+//import haxe.Stack;
 
 class HtmlWriter implements IDocumentWriter
 {

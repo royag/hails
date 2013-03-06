@@ -10,7 +10,7 @@ import hails.html.ViewTool;
 import hails.util.StringUtil;
 import haxe.Template;
 import php.Exception;
-import php.io.File;
+import sys.io.File;
 import php.Lib;
 
 

@@ -7,6 +7,7 @@ package hails;
 import hails.html.ViewTool;
 import php.Session;
 import php.Web;
+import haxe.ds.StringMap;
 
 class HailsController extends HailsBaseController
 {
@@ -42,7 +43,7 @@ class HailsController extends HailsBaseController
 	/**
 	 * @return the GET and POST parameters
 	 */
-	function getParams() : Hash < String > {
+	function getParams() : StringMap<String> {
 		return Web.getParams();
 	}
 	
@@ -70,9 +71,9 @@ class HailsController extends HailsBaseController
 		return val;
 	}
 	
-	function getParamsFor(recName : String) : Hash < String > {
-		var params:Hash<String> = getParams();
-		var rec:Hash<String> = new Hash<String>();
+	function getParamsFor(recName : String) : StringMap<String> {
+		var params:StringMap<String> = getParams();
+		var rec:StringMap<String> = new StringMap<String>();
 		var it:Iterator<String> = params.keys();
 		var fn:String;  //'user[name]';
 		while (it.hasNext()) {
@@ -113,7 +114,7 @@ class HailsController extends HailsBaseController
 		return isMethod('GET');
 	}
 	
-	function getMultipart(maxSize : Int) : Hash < String > {
+	function getMultipart(maxSize : Int) : StringMap<String> {
 		return myGetMultipart(maxSize);
 	}
 	
@@ -131,8 +132,8 @@ class HailsController extends HailsBaseController
 		return ViewTool.h(s);
 	}
 	
-	private static function myGetMultipart( maxSize : Int ) : Hash<String> {
-		var h = new Hash();
+	private static function myGetMultipart( maxSize : Int ) : StringMap<String> {
+		var h = new StringMap<String>();
 		var buf : StringBuf = null;
 		var curname = null;
 		Web.parseMultipart(function(p,fn) {

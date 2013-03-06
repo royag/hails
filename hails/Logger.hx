@@ -6,7 +6,7 @@
 package hails;
 import config.HailsConfig;
 import haxe.io.Output;
-import php.io.File;
+import sys.io.File;
 
 class Logger 
 {

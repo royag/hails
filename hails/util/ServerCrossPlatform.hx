@@ -6,6 +6,7 @@
 package hails.util;
 import php.Session;
 import php.Web;
+import haxe.ds.StringMap;
 
 class ServerCrossPlatform 
 {
@@ -18,7 +19,7 @@ class ServerCrossPlatform
 		return Session.get(key);
 	}
 	
-	public static function getParams() : Hash < String > {
+	public static function getParams() : StringMap < String > {
 		return Web.getParams();
 	}
 	

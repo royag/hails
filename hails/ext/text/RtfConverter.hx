@@ -148,8 +148,7 @@ class RtfConverter
 					out.textElement(text);
 				}
 				case rtf_tag(tag) : {
-					switch (tag) {
-						case CELL : {
+					if (tag == CELL)  {
 							//trace("CELL,inCell=" + inCell + "<br>");
 							if (!inRow) {
 								out.tableRowBegin();
@@ -164,13 +163,13 @@ class RtfConverter
 							out.tableCellEnd();
 							inCell = false;
 						}
-						case ROW : {
+						else if (tag == ROW ) {
 							//trace("ROW<br>");
 							//trace("ROW end<br>");
 							out.tableRowEnd();
 							inRow = false;
 						}
-						case TROWD, 'ltrrow' : {
+						else if (tag == TROWD || tag == 'ltrrow')  {
 							//trace("ROW begin<br>");
 							if (!inRow) {
 								out.tableRowBegin();
@@ -181,17 +180,17 @@ class RtfConverter
 							doTableEnd();
 							return true;
 						}*/
-						case LASTROW : {
+						else if (tag == LASTROW) {
 							doTableEnd();
 							return true;
 						}
-						default : {
+						else {
 							/*if (StringTools.startsWith(tag, SPECIAL_CHAR_START)) {
 								specialChar(tag.substr(1));
 							}*/
 							handleTag(tag);
 						}						
-					}
+					//}
 				}
 				case rtf_block(block) : {
 					//trace(block);
@@ -226,52 +225,51 @@ class RtfConverter
 	var isUnderline : Bool; // = false;
 	
 	function handleTag(tag:String) {
-		switch (tag) {
-			case TEXT_BOLD : {
+		if (tag == TEXT_BOLD ) {
 				if (!isBold) {
 					out.boldBegin();
 					isBold = true;
 				}
 			}
-			case TEXT_BOLD_OFF : {
+		else if (tag == TEXT_BOLD_OFF ) {
 				if (isBold) {
 					out.boldEnd();
 					isBold = false;
 				}
 			}
-			case TEXT_ITALIC : {
+			else if (tag ==  TEXT_ITALIC ) {
 				if (!isItalic) {
 					out.italicBegin();
 					isItalic = true;
 				}
 			}
-			case TEXT_ITALIC_OFF : {
+			else if (tag ==  TEXT_ITALIC_OFF ) {
 				if (isItalic) {
 					out.italicEnd();
 					isItalic = false;
 				}
 			}
-			case TEXT_UNDERLINE : {
+			else if (tag ==  TEXT_UNDERLINE ) {
 				if (!isUnderline) {
 					out.underlineBegin();
 					isUnderline = true;
 				}
 			}
-			case TEXT_UNDERLINE_OFF : {
+			else if (tag ==  TEXT_UNDERLINE_OFF ) {
 				if (isUnderline) {
 					out.underlineEnd();
 					isUnderline = false;
 				}
 			}
-			case TAB : {
+			else if (tag ==  TAB ) {
 				out.textElement(' ');
 			}
-			default : {
+			else {
 				if (StringTools.startsWith(tag, SPECIAL_CHAR_START)) {
 					out.specialChar(tag.substr(1));
 				}
 			}
-		}		
+		//}		
 	}
 	
 	
@@ -298,7 +296,7 @@ class RtfConverter
 					}
 				}
 				case rtf_tag(tag) : {
-					switch (tag) {
+					//switch (tag) {
 						/*case TEXT_BOLD : {
 							boldBegin();
 							isBold = true;
@@ -323,25 +321,24 @@ class RtfConverter
 							underlineEnd();
 							isUnderline = false;
 						}*/
-						case TROWD : {
+						if (tag == TROWD ) {
 							parseTableBegins(it);
 						}
-						case PAR : {
+						else if (tag == PAR ) {
 							//paragraphEnd();
 							inPara = false;
 							//paragraphBegin();
 							inPara = true;
 						}
-						case FCHARSET0, COLORTBL, GENERATOR : {
+						else if ((tag == FCHARSET0) || (tag == COLORTBL) || (tag == GENERATOR)) {
 							skipNextText = true;
-						}
-						default : {
+						}else {
 							/*if (StringTools.startsWith(tag, SPECIAL_CHAR_START)) {
 								specialChar(tag.substr(1));
 							}*/
 							handleTag(tag);
 						}
-					}
+					//}
 					lastTag = tag;
 				}
 				case rtf_block(block) : parseBlock(block); // buf.add(parseBlock(block));

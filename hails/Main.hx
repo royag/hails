@@ -1,10 +1,10 @@
 ﻿package hails;
 
 import hails.HailsDispatcher;
-import php.db.Connection;
-import php.db.Mysql;
-import php.db.ResultSet;
-import php.io.File;
+import sys.db.Connection;
+import sys.db.Mysql;
+import sys.db.ResultSet;
+import sys.io.File;
 import php.Lib;
 import php.Session;
 import php.Web;
@@ -41,13 +41,13 @@ class Main extends HailsDispatcher
 			port : DatabaseConfig.port,
 		    database : DatabaseConfig.database
 		});
-		php.db.Manager.cnx = cnx;
-		php.db.Manager.initialize();
+		sys.db.Manager.cnx = cnx;
+		sys.db.Manager.initialize();
 	}
 	
 	static function cleanupDb() {
-		php.db.Manager.cleanup();
-		php.db.Manager.cnx.close();
+		sys.db.Manager.cleanup();
+		sys.db.Manager.cnx.close();
 	}
 	
 	function doubleThis(i:Int) : Int {

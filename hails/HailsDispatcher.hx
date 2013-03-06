@@ -10,6 +10,7 @@ import hails.util.StringUtil;
 import php.Exception;
 import php.Lib;
 import php.Web;
+import haxe.ds.StringMap;
 
 // ControllerConfig should import all controllers, just to make them compile...
 // (Because if there are no references (as they are loaded dynamically) they're not compiled.
@@ -92,7 +93,7 @@ class HailsDispatcher {
 	
 	static function figureRoute() : Route {
 		var method:String = Web.getMethod().toUpperCase();
-		var params:Hash<String> = Web.getParams();
+		var params:StringMap<String> = Web.getParams();
 		//trace(Web.getParamValues('_method'));
 		if (method == 'POST') {
 			/*var methodParam:Array < String > = Web.getParamValues('_method');
@@ -146,7 +147,7 @@ class HailsDispatcher {
 	
 	public static function handleRequest() : Void {
 		try {
-		var params:Hash<String> = Web.getParams();
+		var params:StringMap<String> = Web.getParams();
 		var actionName:String = getActionName();
 		//trace(actionName);
 		if (StringTools.startsWith(actionName, "_")) {

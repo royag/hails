@@ -8,11 +8,12 @@ package hails;
 import config.DatabaseConfig;
 //import controller.UserController;
 import hails.util.StringUtil;
-import php.db.Connection;
-import php.db.Object;
-import php.db.ResultSet;
-import php.db.Mysql;
+import sys.db.Connection;
+import sys.db.Object;
+import sys.db.ResultSet;
+import sys.db.Mysql;
 import Type;
+import haxe.ds.StringMap;
 
 class HailsDbRecord extends hails.HailsBaseRecord {
 	public var id:Int;
@@ -21,7 +22,7 @@ class HailsDbRecord extends hails.HailsBaseRecord {
 		
 	}
 	
-	var _joinedFields:Hash<String>;
+	var _joinedFields:StringMap<String>;
 	
 	public static function mergeConditions(conds:Array<Dynamic>, extraConditions:Array<Dynamic>) : Array<Dynamic>{
 		if (conds == null) {
@@ -42,7 +43,7 @@ class HailsDbRecord extends hails.HailsBaseRecord {
 		var thisFields:Array<String> = Reflect.fields(this);
 		this._fieldNames = new List<String>();
 		var camelizedField:String;
-		_joinedFields = new Hash<String>();
+		_joinedFields = new StringMap<String>();
 		for (i in 0...resFields.length) {
 			camelizedField = StringUtil.camelizeWithFirstAsLower(resFields[i]);
 			if (arrayContains(thisFields, camelizedField)) {
@@ -55,7 +56,7 @@ class HailsDbRecord extends hails.HailsBaseRecord {
 		}
 	}
 
-	public function getJoinedFields() : Hash < String > {
+	public function getJoinedFields() : StringMap<String> {
 		return _joinedFields;		
 	}
 
@@ -495,7 +496,7 @@ class HailsDbRecord extends hails.HailsBaseRecord {
 		}
 	}
 	
-	public function updateFromHash(data:Hash < Dynamic > , fields:Array < String > ) {
+	public function updateFromHash(data:StringMap < Dynamic > , fields:Array < String > ) {
 		var it:Iterator<String> = fields.iterator();
 		var fn:String;
 		while (it.hasNext()) {

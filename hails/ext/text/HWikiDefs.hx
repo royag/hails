@@ -32,8 +32,8 @@ class HWikiDefs
 		return LINE_FEED + num + '. ';
 	}
 	
-	public static var IMAGE_FUNC = '$pic';
-	public static var LINK_FUNC = '$link';
-	public static var FILELINK_FUNC = '$file';
-	public static var ARTICLELINK_FUNC = '$article';
+	public static var IMAGE_FUNC = "$pic";
+	public static var LINK_FUNC = "$link";
+	public static var FILELINK_FUNC = "$file";
+	public static var ARTICLELINK_FUNC = "$article";
 }

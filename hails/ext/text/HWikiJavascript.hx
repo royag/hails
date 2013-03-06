@@ -4,8 +4,10 @@
  */
 
 package hails.ext.text;
-import js.Dom;
-import js.Lib;
+#if js
+//#import js.Dom;
+//#import js.Lib;
+#end
 //import js.Textarea;
 import hails.ext.text.HWikiDefs;
 

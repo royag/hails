@@ -5,6 +5,7 @@
 
 package hails;
 import hails.util.StringUtil;
+import haxe.ds.StringMap;
 
 class HailsBaseRecord 
 {
@@ -26,11 +27,11 @@ class HailsBaseRecord
 		
 	}
 	
-	var _errorFields:Hash<String>;
+	var _errorFields:StringMap<String>;
 	
 	function addFieldError(fieldName:String, errorDescription:String) {
 		if (_errorFields == null) {
-			_errorFields = new Hash<String>();
+			_errorFields = new StringMap<String>();
 		}
 		_errorFields.set(fieldName, errorDescription);
 	}

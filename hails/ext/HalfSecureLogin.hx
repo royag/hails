@@ -11,7 +11,7 @@ import hails.html.ViewTool;
 import hails.util.ServerCrossPlatform;
 import hails.util.DynamicUtil;
 #end
-import haxe.Md5;
+import haxe.crypto.Md5;
 
 /**
  * Contains methods for serverside PHP(/Neko) and clientside JavaScript
