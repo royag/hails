@@ -6,10 +6,8 @@
 package hails;
 
 import config.HailsConfig;
+import hails.platform.IWebContext;
 import hails.util.StringUtil;
-import php.Exception;
-import php.Lib;
-import php.Web;
 import haxe.ds.StringMap;
 
 // ControllerConfig should import all controllers, just to make them compile...
@@ -19,14 +17,14 @@ import config.ControllerConfig;
 //
 class HailsDispatcher {
 
-	/*public function new() {
+	public function new() {
 		
-	}*/
+	}
 	
 	static var controllerClassPrefix:String = "controller.";
 	
-	static function getUriPart(n:Int) : String {
-		var uri:String = Web.getURI();
+	function getUriPart(n:Int, ctx:IWebContext) : String {
+		var uri:String = ctx.getURI();
 		if (uri.charAt(uri.length - 1) == "/") {
 			uri = uri.substr(0, uri.length - 1);
 		}
@@ -38,28 +36,28 @@ class HailsDispatcher {
 	}
 	
 	//static var uriScriptnameNo = 1;
-	static function getUriScriptnameNo() {
+	function getUriScriptnameNo() {
 		return HailsConfig.getUriScriptnameNo();
 	}
 	
-	static function getScriptName() : String {
-		return getUriPart(getUriScriptnameNo());
+	function getScriptName(ctx:IWebContext) : String {
+		return getUriPart(getUriScriptnameNo(),ctx);
 	}
 	
-	static function getUriAfterControllerPart(n:Int) : String {
-		return getUriPart(getUriScriptnameNo()+1+n);
+	function getUriAfterControllerPart(n:Int,ctx:IWebContext) : String {
+		return getUriPart(getUriScriptnameNo()+1+n,ctx);
 	}
 	
-	static function getControllerUri() : String {
-		return getUriPart(getUriScriptnameNo() + 1);
+	 function getControllerUri(ctx:IWebContext) : String {
+		return getUriPart(getUriScriptnameNo() + 1,ctx);
 	}
 	
-	static function getActionUri() : String {
-		return getUriAfterControllerPart(1);
+	function getActionUri(ctx:IWebContext) : String {
+		return getUriAfterControllerPart(1,ctx);
 	}
 	
-	static function getControllerName() {
-		var s = getControllerUri();
+	function getControllerName(ctx:IWebContext) {
+		var s = getControllerUri(ctx);
 		if (s == null) {
 			s = HailsConfig.defaultController;
 		}
@@ -69,31 +67,31 @@ class HailsDispatcher {
 		return s;
 	}
 	
-	static var overriddenAction:String = null;
-	static function getActionName() {
+	var overriddenAction:String = null;
+	function getActionName(ctx:IWebContext) {
 		if (overriddenAction != null) {
 			return overriddenAction;
 		}
-		var s = getActionUri();
+		var s = getActionUri(ctx);
 		if (s != null && s != "") {
 			s = StringUtil.camelizeWithFirstAsLower(s);
 		} else {
-			return null; // "index";
+			return "index";
 		}
 		return s;
 	}
 	
-	static function pageNotFound() : Void {
-		Web.setReturnCode(404);
-		Lib.print("404 Page don't exist");		
+	function pageNotFound(ctx:IWebContext) : Void {
+		ctx.setReturnCode(404);
+		ctx.print("404 Page don't exist");		
 	}
 	
 	//static var urlParam = null;
 	//static var urlParam2 = null;
 	
-	static function figureRoute() : Route {
-		var method:String = Web.getMethod().toUpperCase();
-		var params:StringMap<String> = Web.getParams();
+	function figureRoute(ctx:IWebContext) : Route {
+		var method:String = ctx.getMethod().toUpperCase();
+		var params:StringMap<String> = ctx.getParams();
 		//trace(Web.getParamValues('_method'));
 		if (method == 'POST') {
 			/*var methodParam:Array < String > = Web.getParamValues('_method');
@@ -104,8 +102,8 @@ class HailsDispatcher {
 				method = params.get('_method');
 			}
 		}
-		var part1 = getUriAfterControllerPart(1);
-		var part2 = getUriAfterControllerPart(2);
+		var part1 = getUriAfterControllerPart(1,ctx);
+		var part2 = getUriAfterControllerPart(2,ctx);
 		//urlParam = part1;
 		//urlParam2 = part2;
 		//trace(part1);
@@ -144,33 +142,41 @@ class HailsDispatcher {
 		}*/
 		return null;
 	}
+	public static function handleRequest(ctx:IWebContext) : Void {
+		var h = new HailsDispatcher();
+		h.doHandleRequest(ctx);
+	}
 	
-	public static function handleRequest() : Void {
+	function doHandleRequest(ctx:IWebContext) : Void {
 		try {
-		var params:StringMap<String> = Web.getParams();
-		var actionName:String = getActionName();
+		var params:StringMap<String> = ctx.getParams();
+		var actionName:String = getActionName(ctx);
 		//trace(actionName);
+		if (actionName == null) {
+			actionName = "";
+		}
 		if (StringTools.startsWith(actionName, "_")) {
 			Logger.logDebug("ERR: Tried underscore-action: " + actionName);
-			pageNotFound();
+			pageNotFound(ctx);
 			return;
 		}
-		var controllerId = getControllerUri();
+		var controllerId = getControllerUri(ctx);
 		//trace(controllerId);
 		if (controllerId == null) {
 			// default index
 			controllerId = HailsConfig.defaultController;
 		}
-		var fullControllerName = controllerClassPrefix + getControllerName();
+		var fullControllerName = controllerClassPrefix + getControllerName(ctx);
 		var controllerClass:Class<Dynamic> = Type.resolveClass(fullControllerName);
 		if (controllerClass != null) {
-			var controller:HailsController = Type.createInstance(controllerClass, [actionName]);
+			var constructorParams:Array<Dynamic> = [actionName, ctx];
+			var controller:HailsController = Type.createInstance(controllerClass, constructorParams);
 			//if (Reflect.hasField(controller, 'actions')) {
 			//	var actions:Dynamic = Reflect.field(controller, 'actions');
 			//	
 			//}
-			var part1 = getUriAfterControllerPart(1);
-			var part2 = getUriAfterControllerPart(2);
+			var part1 = getUriAfterControllerPart(1,ctx);
+			var part2 = getUriAfterControllerPart(2,ctx);
 			controller.urlParam = part1;
 			controller.urlParam2 = part2;
 		
@@ -179,7 +185,7 @@ class HailsDispatcher {
 			if (Reflect.hasField(controller, actionMethodName)) {
 				actionFound = true;
 			} else {
-				var route = figureRoute();
+				var route = figureRoute(ctx);
 				//trace(route);
 				if (route != null) {
 					actionMethodName = controller.route(route);
@@ -210,10 +216,10 @@ class HailsDispatcher {
 							overriddenAction = hc.initialAction;
 							//trace("after CALLMETHOD");
 							if (!hc.hasRendered && hc.shouldRender) {
-								doRender(hc);						
+								doRender(hc,ctx);						
 							}
 						}
-						Web.flush();
+						ctx.flush();
 						return;
 					} catch (err:Dynamic) {
 						hasError = true;
@@ -227,7 +233,7 @@ class HailsDispatcher {
 			}
 		}
 		Logger.logDebug("Unknown controller/action: " + controllerId + "/" + actionName);
-		pageNotFound();
+		pageNotFound(ctx);
 		//trace("PAGE NOT FOUND");
 		} catch (anyError:Dynamic) {
 			Logger.logError("HailsDispatcher.handleRequest():" + anyError);
@@ -235,13 +241,16 @@ class HailsDispatcher {
 		}
 	}
 	
-	static function doRender(hc:HailsController) {
+	function doRender(hc:HailsController, ctx:IWebContext) {
+		#if php
 		if (hc.renderType == "php") {
-			new HailsViewPhp(hc, getControllerUri(), getActionName()).render();
-		} else if (hc.renderType == "html") {
+			new HailsViewPhp(hc, getControllerUri(ctx), getActionName(ctx)).render();
+		} else 
+		#end
+		if (hc.renderType == "html") {
 			hc.render();
 		} else {
-			throw new Exception("Unknown rendertype: " + hc.renderType);
+			throw /*new Exception(*/"Unknown rendertype: " + hc.renderType; // );
 		}
 	}
 }

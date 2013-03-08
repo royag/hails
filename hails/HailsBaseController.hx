@@ -9,13 +9,15 @@ import config.HailsConfig;
 import hails.html.ViewTool;
 import hails.util.StringUtil;
 import haxe.Template;
-import php.Exception;
 import sys.io.File;
-import php.Lib;
+import hails.platform.IWebContext;
 
 
 class HailsBaseController {
-	public function new(initialAction:String) {
+	var WebCtx:IWebContext;
+	
+	public function new(initialAction:String, ctx:IWebContext) {
+		this.WebCtx = ctx;
 		this.initialAction = initialAction;
 		this.hasRendered = false;
 		this.shouldRender = true;
@@ -68,7 +70,7 @@ class HailsBaseController {
 			action = this.initialAction;
 		}*/
 		if (action == null) {
-			throw new Exception("No action to render");
+			throw /*new Exception(*/"No action to render";// );
 		}
 		if (action.indexOf("/") < 0) {
 			return config.HailsConfig.phpViewRoot + "/" + controllerId + "/" + action;
@@ -139,7 +141,7 @@ class HailsBaseController {
 		var subviews:Array<String> = null;
 		var subviews:Array<String> = null;
 		var viewAction:String = StringUtil.tableize(action);
-		if (options != null || getDefaultSubs() != null) {
+		if (options != null) { // || getDefaultSubs() != null) {
 			if (Reflect.hasField(options, 'view')) {
 				viewAction = Reflect.field(options, 'view');
 			}
@@ -191,17 +193,18 @@ class HailsBaseController {
 		}
 		if (format == 'html') {
 			var html = getHtml(resolveHtmlViewName(viewAction), data, layout, callBacks);
-			Lib.print(html);
+			WebCtx.print(html);
 		} else {
-			throw new Exception("Unknown format: " + format);
+			throw /*new Exception(*/"Unknown format: " + format; // );
 		}
 	}
 	
 	function renderRaw(outputData) {
 		setAsRendered();
-		Lib.print(outputData);
+		WebCtx.print(outputData);
 	}
 	
+	#if php
 	/**
 	 * Include default php-view in action-methods, so that the calling method's local variables 
 	 * - as well as the controllers methods and instance method - are made available to the PHP-script.
@@ -215,4 +218,5 @@ class HailsBaseController {
 		var render = doRender;
 		HailsPhpRenderer.includePhp(resolvePhpViewName(action));
 	}
+	#end
 }

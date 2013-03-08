@@ -5,8 +5,7 @@
 
 package hails;
 import hails.html.ViewTool;
-import php.Session;
-import php.Web;
+import hails.platform.IWebContext;
 import haxe.ds.StringMap;
 
 class HailsController extends HailsBaseController
@@ -14,8 +13,8 @@ class HailsController extends HailsBaseController
 	static var ERROR_MESSAGE = 'ERROR_MESSAGE';
 	static var INFO_MESSAGE = 'INFO_MESSAGE';
 	
-	public function new(initialAction:String) {
-		super(initialAction);
+	public function new(initialAction:String, ctx:IWebContext) {
+		super(initialAction, ctx);
 		errorMessage = getSession(ERROR_MESSAGE);
 		infoMessage = getSession(INFO_MESSAGE);
 		setSession(INFO_MESSAGE, null);
@@ -44,7 +43,7 @@ class HailsController extends HailsBaseController
 	 * @return the GET and POST parameters
 	 */
 	function getParams() : StringMap<String> {
-		return Web.getParams();
+		return WebCtx.getParams();
 	}
 	
 	/**
@@ -90,20 +89,20 @@ class HailsController extends HailsBaseController
 	 * @return all the GET parameters String
 	 */
 	function getParamsString() : String {
-		return Web.getParamsString();
+		return WebCtx.getParamsString();
 	}
 	
 	function getParamValues(param : String) : Array < String > {
-		return Web.getParamValues(param);
+		return WebCtx.getParamValues(param);
 	}
 	
 	function redirect(url : String) {
-		Web.redirect(url);
+		WebCtx.sendRedirect(url);
 		setAsRendered();
 	}
 
 	function isMethod(m:String) : Bool {
-		return (Web.getMethod().toUpperCase() == m.toUpperCase());
+		return (WebCtx.getMethod().toUpperCase() == m.toUpperCase());
 	}
 	
 	function isPost() : Bool {
@@ -119,10 +118,10 @@ class HailsController extends HailsBaseController
 	}
 	
 	function setSession(key:String, val:Dynamic) {
-		Session.set(key, val);
+		WebCtx.setSession(key, val);
 	}
 	function getSession(key:String):Dynamic {
-		return Session.get(key);
+		return WebCtx.getSession(key);
 	}
 	function pathTo(controller:String, action:String, ?anyGetParams:Dynamic) : String {
 		return ViewTool.pathTo(controller, action, anyGetParams);
@@ -132,11 +131,12 @@ class HailsController extends HailsBaseController
 		return ViewTool.h(s);
 	}
 	
-	private static function myGetMultipart( maxSize : Int ) : StringMap<String> {
+	
+	private function myGetMultipart( maxSize : Int ) : StringMap<String> {
 		var h = new StringMap<String>();
 		var buf : StringBuf = null;
 		var curname = null;
-		Web.parseMultipart(function(p,fn) {
+		WebCtx.parseMultipart(function(p,fn) {
 			if( curname != null )
 				h.set(curname,buf.toString());
 			curname = p;

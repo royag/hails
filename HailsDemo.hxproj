@@ -2,15 +2,15 @@
 <project version="2">
   <!-- Output SWF options -->
   <output>
-    <movie outputType="OtherIDE" />
+    <movie outputType="CustomBuild" />
     <movie input="" />
     <movie path="" />
     <movie fps="30" />
     <movie width="400" />
     <movie height="400" />
-    <movie version="0" />
+    <movie version="1" />
     <movie minorVersion="0" />
-    <movie platform="JavaScript" />
+    <movie platform="PHP" />
     <movie background="#FFFFFF" />
   </output>
   <!-- Other classes to be compiled into your SWF -->
@@ -44,7 +44,7 @@
   <!-- Other project options -->
   <options>
     <option showHiddenPaths="False" />
-    <option testMovie="NewTab" />
+    <option testMovie="Unknown" />
   </options>
   <!-- Plugin storage -->
   <storage />

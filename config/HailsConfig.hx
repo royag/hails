@@ -30,6 +30,12 @@ class HailsConfig {
 	}
 	
 	public static function getUriScriptnameNo() : Int {
+		/*#if php
+		return 1;
+		#end
+		#if java
+		return 0;
+		#end*/
 		return 1;
 	}
 	

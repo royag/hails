@@ -16,7 +16,7 @@ import Type;
 import haxe.ds.StringMap;
 
 class HailsDbRecord extends hails.HailsBaseRecord {
-	public var id:Int;
+	public var id:Int = -1;
 	
 	public function new() {
 		
@@ -72,7 +72,7 @@ class HailsDbRecord extends hails.HailsBaseRecord {
 	}
 	
 	public function isNew() : Bool {
-		return (this.id == null);
+		return (this.id != -1); // == null);
 	}
 	
 	public function fieldValue(fname:String) : Dynamic {
@@ -234,7 +234,7 @@ class HailsDbRecord extends hails.HailsBaseRecord {
 		if (!hadConn) {
 			conn = createConnection();
 		}
-		var count:Int = null;
+		var count:Int = -1; // null;
 		try {
 			var sql = createSql('count(*)', c, createJoinsAndWhere(options,conn), options);
 			var res = runSql(sql, conn);

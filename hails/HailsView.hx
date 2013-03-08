@@ -5,8 +5,6 @@
 
 package hails;
 
-import php.Exception;
-
 class HailsView {
 
 	var controller:HailsController;
@@ -20,6 +18,6 @@ class HailsView {
 	}
 	
 	public function render() {
-		throw new Exception("Render not implemented for " + Type.getClassName(Type.getClass(this)));
+		throw /*new Exception(*/"Render not implemented for " + Type.getClassName(Type.getClass(this)); // );
 	}
 }

@@ -156,11 +156,19 @@ class ViewTool
 	}
 	
 	public static function htmlEntities(s:String) : String {
+		#if php
 		return untyped __call__("htmlentities", s);
+		#else
+		return null;
+		#end
 	}
 	
 	public static function htmlSpecialChars(s) : String {
+		#if php
 		return untyped __call__("htmlspecialchars", s);
+		#else
+		return null;
+		#end
 	}
 	
 	public static function _inputFor(resolve : String -> Dynamic, recName:String, fieldName:String) : String {
