@@ -6,12 +6,12 @@
 package hails.script;
 
 import hails.util.StringUtil;
-import php.FileSystem;
-import php.Session;
+import sys.FileSystem;
+//import php.Session;
 
-import php.io.File;
-import php.Lib;
-import php.Sys;
+import sys.io.File;
+import neko.Lib;
+//import sys.Sys;
 
 class Main {
 
@@ -47,7 +47,7 @@ class Main {
 			if (StringTools.endsWith(fn, ".hx")) {
 				var modelName = fn.substr(0, fn.length - 3);
 				Lib.println("----------------|" + modelName);
-				var h:Hash < DbFieldInfo > = cparser.findPublicProperties("model." + modelName, null);
+				var h:Map < String, DbFieldInfo > = cparser.findPublicProperties("model." + modelName, null);
 				DbManipulator.createOrAlterTable(StringUtil.tableize(modelName), h);
 				count += 1;
 			}

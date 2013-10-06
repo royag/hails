@@ -16,7 +16,7 @@ import Type;
 import haxe.ds.StringMap;
 
 class HailsDbRecord extends hails.HailsBaseRecord {
-	public var id:Int = -1;
+	public var id:Int;
 	
 	public function new() {
 		

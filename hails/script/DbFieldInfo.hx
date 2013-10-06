@@ -5,7 +5,7 @@
 
 package hails.script;
 
-import php.Exception;
+//import php.Exception;
 
 enum DbFieldType {
 	dbInt;
@@ -72,7 +72,7 @@ class DbFieldInfo {
 		var end = t.indexOf(")");
 		var len:Int = Std.parseInt(t.substr(start + 1, end - start - 1));
 		if (len == null) {
-			throw new Exception("Could not parse int: " + t.substr(start + 1, end - start));
+			throw "Could not parse int: " + t.substr(start + 1, end - start);
 			//return -1;
 		}
 		return len;
@@ -105,7 +105,7 @@ class DbFieldInfo {
 		} else if (StringTools.startsWith(mysqlType, "text")) {
 			dbtype = dbText;
 		} else {
-			throw new Exception("unknown databasetype: " + mysqlType);
+			throw "unknown databasetype: " + mysqlType;
 		}
 		var t = new DbFieldInfo(dbtype);
 		t.length = findLengthOfMysqlType(mysqlType);
@@ -115,6 +115,7 @@ class DbFieldInfo {
 	
 	public static function createFromHaxeTypeName(typeName:String, ?annot:String) {
 		var t:DbFieldType;
+		var length = -1;
 		switch(typeName) {
 			case "Int" : t = dbInt;
 			case "String" : {
@@ -128,15 +129,22 @@ class DbFieldInfo {
 						t = dbLongBlob;
 					} else if (annot.toLowerCase() == '@text') {
 						t = dbText;
+					} else {
+						var lenStr = StringTools.trim(annot.substr(1));
+						length = Std.parseInt(lenStr);
 					}
 				} 
 			}
 			case "Bool" : t = dbBoolean;
 			case "Float" : t = dbFloat;
 			case "Date" : t = dbDatetime;
-			default : throw new Exception("Unknown typeName: " + typeName);
+			default : throw "Unknown typeName: " + typeName;
 		}
-		return new DbFieldInfo(t);
+		var ret = new DbFieldInfo(t);
+		if (length > -1) {
+			ret.length = length;
+		}
+		return ret;
 	}
 	
 	public function isNullable() : Bool {

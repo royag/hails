@@ -6,8 +6,8 @@
 package hails.script;
 
 import hails.util.StringUtil;
-import php.io.File;
-import php.Lib;
+import sys.io.File;
+import neko.Lib;
 
 class CodeParser {
 
@@ -26,7 +26,10 @@ class CodeParser {
 	}
 	
 	public function pathToClass(cname:String) : String {
-		return rootDir + StringTools.replace(cname, '.', '/') + '.hx';
+		
+		var fn = rootDir + StringTools.trim(StringTools.replace(cname, '.', '/')) + ".hx";
+		//trace("path to class: " + fn);
+		return fn;
 	}
 	
 	public function findParentClass(className:String) : String {
@@ -63,11 +66,11 @@ class CodeParser {
 	 * @param	className
 	 * @param	prev
 	 */
-	public function findPublicProperties(className:String, prev:Hash < DbFieldInfo > ) {
+	public function findPublicProperties(className:String, prev:Map < String, DbFieldInfo > ) {
 		output(className);
-		var ret:Hash<DbFieldInfo>;
+		var ret:Map < String, DbFieldInfo >;
 		if (prev == null) {
-			ret = new Hash<DbFieldInfo>();
+			ret = new Map < String, DbFieldInfo >();
 		} else {
 			ret = prev;
 		}

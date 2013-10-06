@@ -12,6 +12,6 @@ class DatabaseConfig {
 	public static var password = 'test';
 	public static var host = 'localhost';
 	public static var port = 3306;
-	public static var database = 'hailstest_dev';
+	public static var database = 'test';
 	
 }

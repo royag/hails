@@ -6,11 +6,11 @@
 package hails.script;
 
 import config.DatabaseConfig;
-import php.db.Connection;
-import php.db.ResultSet;
+import sys.db.Connection;
+import sys.db.ResultSet;
 import hails.HailsDbRecord;
-import php.Exception;
-import php.Lib;
+//import php.Exception;
+import neko.Lib;
 
 
 class DbManipulator {
@@ -32,7 +32,7 @@ class DbManipulator {
 		runSql("ALTER TABLE " + tableName + " DROP COLUMN " + colName);
 	}
 	
-	static function createTable(tableName:String, fieldTypeHash:Hash < DbFieldInfo > ) {
+	static function createTable(tableName:String, fieldTypeHash:Map < String, DbFieldInfo > ) {
 		var sql = "CREATE TABLE " + tableName + " (";
 		var first = true;
 		for (key in fieldTypeHash.keys()) {
@@ -51,7 +51,7 @@ class DbManipulator {
 		return HailsDbRecord.runSql(sql, connection);
 	}
 	
-	public static function createOrAlterTable(tableName:String, fieldTypeHash:Hash < DbFieldInfo > ) : Void {
+	public static function createOrAlterTable(tableName:String, fieldTypeHash:Map < String, DbFieldInfo > ) : Void {
 		connection = HailsDbRecord.createConnection();
 		try {
 			if (getTables().filter(function(s:String) { 
@@ -103,9 +103,9 @@ class DbManipulator {
 		return ret;
 	}
 	
-	static function getFieldsFrom(table:String) : Hash< DbFieldInfo > {
+	static function getFieldsFrom(table:String) : Map < String, DbFieldInfo > {
 		var res:ResultSet = runSql("SHOW FIELDS FROM " + table);
-		var ret = new Hash< DbFieldInfo >();
+		var ret = new Map < String, DbFieldInfo >();
 		while (res.hasNext()) {
 			var f = res.next();
 			//trace(f);
