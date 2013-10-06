@@ -10,7 +10,7 @@
     <movie height="400" />
     <movie version="1" />
     <movie minorVersion="0" />
-    <movie platform="PHP" />
+    <movie platform="Java" />
     <movie background="#FFFFFF" />
   </output>
   <!-- Other classes to be compiled into your SWF -->

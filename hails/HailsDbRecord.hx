@@ -11,7 +11,7 @@ import hails.util.StringUtil;
 import sys.db.Connection;
 import sys.db.Object;
 import sys.db.ResultSet;
-import sys.db.Mysql;
+import javaext.db.Mysql;
 import Type;
 import haxe.ds.StringMap;
 
@@ -401,7 +401,7 @@ class HailsDbRecord extends hails.HailsBaseRecord {
 					}
 					fnString += StringUtil.tableize(fn);
 					if (val != null) {
-						valString += "'" + conn.escape(val) + "'";
+						valString += conn.escape(val); // "\"" + conn.escape(val) + "\"";
 					} else {
 						valString += "NULL";
 					}
@@ -532,8 +532,9 @@ class HailsDbRecord extends hails.HailsBaseRecord {
 			}
 		} catch (err:Dynamic) {
 			this._error = 'System error';
-			Logger.logError('during saving of ' + this + ': ' + err);
+			Logger.logError('during saving of ' + this + ': ' + err); throw err;
 			return false;
+			
 		}
 	}
 }
