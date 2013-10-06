@@ -11,7 +11,12 @@ import hails.util.StringUtil;
 import sys.db.Connection;
 import sys.db.Object;
 import sys.db.ResultSet;
+#if java
 import javaext.db.Mysql;
+#end
+#if !java
+import sys.db.Mysql;
+#end
 import Type;
 import haxe.ds.StringMap;
 
