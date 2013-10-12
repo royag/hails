@@ -10,6 +10,9 @@ import java.util.Set;
 import java.Lib;
 import java.io.IOException;
 import javax.servlet.ServletOutputStream;
+import java.io.PrintWriter;
+import java.NativeArray;
+import hails.HailsDbRecord;
 
 /**
  * ...
@@ -19,26 +22,47 @@ class JavaWebContext implements IWebContext
 {
 	var request:HttpServletRequest;
 	var response:HttpServletResponse;
-	var outStream:ServletOutputStream;
+	//var outStream:ServletOutputStream;
+	var _outStream:PrintWriter;
+	var contentTypeSet:Bool = false;
 	public function new(req:HttpServletRequest, resp:HttpServletResponse) 
 	{
 		this.request = req;
 		this.response = resp;
-		this.response.setCharacterEncoding("UTF-8");
-		try {
-			this.outStream = resp.getOutputStream();
-		} catch (e:IOException) {
-			throw "ERR: " + e.getMessage();
+		//this.response.setContentType("image/jpeg");
+		//this.response.setCharacterEncoding("UTF-8");
+		
+	}
+	
+	public function setContentType(ct:String) : Void {
+		this.response.setContentType(ct);
+		contentTypeSet = true;
+	}
+	public function isContentTypeSet() : Bool {
+		return contentTypeSet;
+	}
+	
+
+	private function outStream() {
+		if (this._outStream == null) {
+			try {
+				//this.outStream = resp.getOutputStream();
+				this._outStream = response.getWriter();
+				//this.outStream.
+			} catch (e:IOException) {
+				throw "ERR: " + e.getMessage();
+			}
 		}
+		return this._outStream;
 	}
 	public function getParams() : StringMap<String> {
-		var map:java.util.Map<String,String> = request.getParameterMap();
+		var map:java.util.Map<String,NativeArray<String>> = request.getParameterMap();
 		var ret = new StringMap<String>();
 		var keys:java.util.Set<String> = map.keySet();
 		var it:java.util.Iterator<Dynamic> = cast(keys.iterator(), java.util.Iterator<Dynamic>);
 		while (it.hasNext()) {
 			var k = it.next();
-			ret.set(k.toString(), map.get(k).toString());
+			ret.set(k.toString(), map.get(k)[0].toString());
 		}
 		return ret;
 		//return JavaWebContext.toStringMap(request.getParameterMap());
@@ -56,31 +80,46 @@ class JavaWebContext implements IWebContext
 		return request.getMethod();
 	}
 	public function setReturnCode(code:Int) : Void {
-		
+		response.setStatus(code);
 	}
 	public function setHeader(key:String, value:String) : Void {
-		
+		response.setHeader(key, value);
 	}
 	public function flush() : Void {
-		try {
-			outStream.flush();
-		} catch (e:IOException) {
+		//try {
+		if (_outStream != null) {
+			outStream().flush();
+		} else {
+			try {
+			response.getOutputStream().flush();
+			} catch (e:IOException) {
+				throw "ERR: " + e.getMessage();
+			}
+		}
+		/*} catch (e:IOException) {
 			throw "ERR: " + e.getMessage();
-		}		
+		}*/		
 	}
 	public function print(s:String) : Void {
-		try {
-			outStream.print(s);
-		} catch (e:IOException) {
+		//try {
+			outStream().print(s);
+		/*} catch (e:IOException) {
 			throw "ERR: " + e.getMessage();
-		}		
+		}*/		
 	}
-	public function println(s:String) : Void {
+	public function printBinary(s:Blob) : Void {
 		try {
-			outStream.println(s);
+			response.getOutputStream().write(s.getData());
 		} catch (e:IOException) {
 			throw "ERR: " + e.getMessage();
-		}		
+		}
+	}	
+	public function println(s:String) : Void {
+		//try {
+			outStream().println(s);
+		/*} catch (e:IOException) {
+			throw "ERR: " + e.getMessage();
+		}*/		
 	}
 	public function getURI() : String {
 		return request.getRequestURI();
@@ -94,5 +133,8 @@ class JavaWebContext implements IWebContext
 	public function getSession(key:String) : Dynamic {
 		return request.getSession().getAttribute(key);
 	}
+	public function getClientHeader(key:String) : String {
+		return request.getHeader(key);
+	}	
 	
 }

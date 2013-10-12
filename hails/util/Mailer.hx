@@ -19,6 +19,16 @@ class Mailer
 		return sendMail(options.to, options.title, options.body,
 			"From: " + options.fromName + " <" + options.fromEmail + ">");			
 	}
+	#else
+	public static function sendMail(toAdress:String, title:String, body:String, ?headers:String) : Bool {
+		return false;
+	}
+	
+	public static function sendMailFrom(
+		options: { to:String, title:String, body:String, fromName:String, fromEmail:String } ): Bool {
+			
+		return false;			
+	}
 	#end
 	
 }

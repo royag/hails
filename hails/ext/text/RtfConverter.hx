@@ -5,6 +5,8 @@
 
 package hails.ext.text;
 
+import hails.HailsDbRecord;
+
 class RtfConverter 
 {
 	var data:RtfElem;
@@ -25,8 +27,8 @@ class RtfConverter
 		return writer.toString();
 	}
 	
-	public static function rtfToHWiki(rawRtf:String) : String {
-		var p = new RtfParser(rawRtf);
+	public static function rtfToHWiki(rawRtf:Blob) : String {
+		var p = new RtfParser(Std.string(rawRtf));
 		p.parse();
 		var writer = new HWikiWriter();
 		var conv = new RtfConverter(p.getParsedElement(), writer);

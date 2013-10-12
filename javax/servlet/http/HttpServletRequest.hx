@@ -19,4 +19,6 @@ extern class HttpServletRequest
 	/*@:overload*/ public function getParameterMap() : Dynamic; // String; // java.util.Map;
 	
 	@:overload public function getParameterValues(name:String) : java.NativeArray<String>;
+	
+	@:overload public function getHeader(key:String) : String;
 }

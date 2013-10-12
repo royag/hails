@@ -16,5 +16,7 @@ extern class HttpServletResponse
 	@:overload public function getOutputStream() : ServletOutputStream;
 	
 	@:overload public function setCharacterEncoding(charset:String) : Void;
+	@:overload public function setContentType(type:String) : Void;
+	@:overload public function setHeader(nane:String,value:String) : Void;
 	
 }

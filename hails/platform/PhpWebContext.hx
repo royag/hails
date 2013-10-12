@@ -10,7 +10,9 @@ import haxe.io.Bytes;
  */
 class PhpWebContext implements IWebContext
 {
+	var contentTypeSet:Bool = false;
 
+	
 	public function new() 
 	{
 		
@@ -25,6 +27,7 @@ class PhpWebContext implements IWebContext
 	public function getParamValues(param:String) : Array<String> {
 		return Web.getParamValues(param);
 	}
+	
 	public function sendRedirect(url:String) : Void {
 		Web.redirect(url);
 	}
@@ -38,9 +41,23 @@ class PhpWebContext implements IWebContext
 	public function setHeader(key:String, value:String) : Void {
 		Web.setHeader(key,value);
 	}
+	
+	public function setContentType(ct:String) : Void {
+		setHeader("Content-Type", ct);
+		contentTypeSet = true;
+	}
+	public function isContentTypeSet() : Bool {
+		return contentTypeSet;
+	}
+	
+	
 	public function flush() : Void {
 		Web.flush();
 	}
+	public function printBinary(s:Blob) : Void {
+		print(s);
+	}
+
 	public function print(s:String) : Void {
 		Lib.print(s);
 	}
@@ -59,5 +76,9 @@ class PhpWebContext implements IWebContext
 	public function getSession(key:String) : Dynamic {
 		return Session.get(key);
 	}
+	public function getClientHeader(key:String) : String {
+		return Web.getClientHeader(key);
+	}
+
 	
 }

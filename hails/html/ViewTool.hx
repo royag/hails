@@ -124,12 +124,12 @@ class ViewTool
 	} 
 	
 
-	public static function _pathTo( resolve : String -> Dynamic, controller:String, ?action:String ) {
-		return pathTo(controller, action);
+	public static function _pathTo( resolve : String -> Dynamic, controller:String, ?action:Dynamic ) {
+		return pathTo(controller, Std.string(action));
 	} 
 
-	public static function _pathToWithParam( resolve : String -> Dynamic, controller:String, action:String, getParams:Dynamic ) {
-		return pathTo(controller, action, getParams);
+	public static function _pathToWithParam( resolve : String -> Dynamic, controller:String, action:Dynamic, getParams:Dynamic ) {
+		return pathTo(controller, Std.string(action), getParams);
 	} 
 	
 	public static function pathToResource(resource:String) : String {
@@ -244,10 +244,12 @@ class ViewTool
 		return StringTools.urlEncode(str);
 	}
 	public static function formatDate(d:Dynamic, format:String) : String {
-		var theDate:Date = d;
+		var theDate:Date = null;
 		if (Type.getClass(d) == String) {
 			// Ooops... we actually get String's from MySQL.. and PHP is dynamically typed, so... :|
 			theDate = Date.fromString(cast d);
+		} else {
+			theDate = d;
 		}
 		return DateTools.format(theDate, format);
 	}

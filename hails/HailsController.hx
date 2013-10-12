@@ -7,6 +7,8 @@ package hails;
 import hails.html.ViewTool;
 import hails.platform.IWebContext;
 import haxe.ds.StringMap;
+import haxe.io.Bytes;
+import hails.HailsDbRecord;
 
 class HailsController extends HailsBaseController
 {
@@ -113,7 +115,7 @@ class HailsController extends HailsBaseController
 		return isMethod('GET');
 	}
 	
-	function getMultipart(maxSize : Int) : StringMap<String> {
+	function getMultipart(maxSize : Int) : StringMap<Blob> {
 		return myGetMultipart(maxSize);
 	}
 	
@@ -122,6 +124,9 @@ class HailsController extends HailsBaseController
 	}
 	function getSession(key:String):Dynamic {
 		return WebCtx.getSession(key);
+	}
+	function getURI() : String {
+		return WebCtx.getURI();
 	}
 	function pathTo(controller:String, action:String, ?anyGetParams:Dynamic) : String {
 		return ViewTool.pathTo(controller, action, anyGetParams);
@@ -132,8 +137,11 @@ class HailsController extends HailsBaseController
 	}
 	
 	
-	private function myGetMultipart( maxSize : Int ) : StringMap<String> {
-		var h = new StringMap<String>();
+	private function myGetMultipart( maxSize : Int ) : StringMap<Blob> {
+		#if java
+		return null;
+		#else
+		var h = new StringMap<Blob>();
 		var buf : StringBuf = null;
 		var curname = null;
 		WebCtx.parseMultipart(function(p,fn) {
@@ -156,5 +164,7 @@ class HailsController extends HailsBaseController
 		if( curname != null )
 			h.set(curname,buf.toString());
 		return h;
+		#end
+		
 	}
 }

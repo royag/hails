@@ -8,8 +8,9 @@ package hails.ext;
 #else
 // serverside-specific imports:
 import hails.html.ViewTool;
-import hails.util.ServerCrossPlatform;
+//import hails.util.ServerCrossPlatform;
 import hails.util.DynamicUtil;
+import hails.platform.IWebContext;
 #end
 import haxe.crypto.Md5;
 
@@ -110,19 +111,19 @@ class HalfSecureLogin
 		return Std.string(Math.round(Math.random() * 10000000 + Math.random() * 10000000));
 	}
 	
-	public static function putChallengeOnSession() {
-		return ServerCrossPlatform.setSession(CHALLENGE, createChallenge());
+	public static function putChallengeOnSession(ctx:IWebContext) {
+		return ctx.setSession(CHALLENGE, createChallenge());
 	}
 	
-	public static function getChallengeFromSession() {
-		return ServerCrossPlatform.getSession(CHALLENGE);
+	public static function getChallengeFromSession(ctx:IWebContext) {
+		return ctx.getSession(CHALLENGE);
 	}
 	
-	public static function clearChallenge() {
-		ServerCrossPlatform.setSession(CHALLENGE, null);
+	public static function clearChallenge(ctx:IWebContext) {
+		ctx.setSession(CHALLENGE, null);
 	}
 	
-	public static function renderNewLoginForm(?options:Dynamic) : String {
+	public static function renderNewLoginForm(ctx:IWebContext, ?options:Dynamic) : String {
 		var submitPath:String = DynamicUtil.fieldOrDefault(options, 'submitPath', ViewTool.pathTo('session'));
 		var namePrompt:String = DynamicUtil.fieldOrDefault(options, 'namePrompt', 'Brukernavn:');
 		var pwdPrompt:String = DynamicUtil.fieldOrDefault(options, 'pwdPrompt', 'Passord:');
@@ -131,8 +132,8 @@ class HalfSecureLogin
 		var extraFormData:String = DynamicUtil.fieldOrDefault(options, 'extraFormData', '');
 		var submitOnEnterField:String = DynamicUtil.fieldOrDefault(options, 'submitOnEnterField', 'login_password');
 		
-		putChallengeOnSession();
-		var challenge = getChallengeFromSession();
+		putChallengeOnSession(ctx);
+		var challenge = getChallengeFromSession(ctx);
 		
 		return
 		'<script type="text/javascript" src="'+ViewTool.pathToResource(loginScript)+'"></script>' +
@@ -162,7 +163,7 @@ class HalfSecureLogin
 		
 	}
 	
-	public static function renderSetPwdForm(?options:Dynamic) : String {
+	public static function renderSetPwdForm(ctx:IWebContext, ?options:Dynamic) : String {
 		var submitPath:String = DynamicUtil.fieldOrDefault(options, 'submitPath', ViewTool.pathTo('password'));
 		var namePrompt:String = DynamicUtil.fieldOrDefault(options, 'namePrompt', 'Brukernavn:');
 		var newPwdPrompt:String = DynamicUtil.fieldOrDefault(options, 'newPwdPrompt', 'Passord:');
@@ -172,8 +173,8 @@ class HalfSecureLogin
 		var submitOnEnterField:String = DynamicUtil.fieldOrDefault(options, 'submitOnEnterField', 'newpw2');
 		var extraFormData:String = DynamicUtil.fieldOrDefault(options, 'extraFormData', '');
 		
-		putChallengeOnSession();
-		var challenge = getChallengeFromSession();
+		putChallengeOnSession(ctx);
+		var challenge = getChallengeFromSession(ctx);
 		
 		return
 		'<script type="text/javascript" src="'+ViewTool.pathToResource(loginScript)+'"></script>' +
@@ -203,7 +204,7 @@ class HalfSecureLogin
 		'</script>';
 	}
 	
-	public static function renderChangePwdForm(?options:Dynamic) : String {
+	public static function renderChangePwdForm(ctx:IWebContext, ?options:Dynamic) : String {
 		var submitPath:String = DynamicUtil.fieldOrDefault(options, 'submitPath', ViewTool.pathTo('password'));
 		var namePrompt:String = DynamicUtil.fieldOrDefault(options, 'namePrompt', 'Brukernavn:');
 		var oldPwdPrompt:String = DynamicUtil.fieldOrDefault(options, 'oldPwdPrompt', 'Gammelt Passord:');
@@ -214,8 +215,8 @@ class HalfSecureLogin
 		var extraFormData:String = DynamicUtil.fieldOrDefault(options, 'extraFormData', '');
 		var submitOnEnterField:String = DynamicUtil.fieldOrDefault(options, 'submitOnEnterField', 'newpw2');
 		
-		putChallengeOnSession();
-		var challenge = getChallengeFromSession();
+		putChallengeOnSession(ctx);
+		var challenge = getChallengeFromSession(ctx);
 		
 		return
 		'<script type="text/javascript" src="'+ViewTool.pathToResource(loginScript)+'"></script>' +
@@ -246,24 +247,24 @@ class HalfSecureLogin
 		'</script>';
 	}
 	
-	public static function getPasswordAction() : String {
-		return ServerCrossPlatform.getParam('pwaction');
+	public static function getPasswordAction(ctx:IWebContext) : String {
+		return ctx.getParams().get('pwaction');
 	}
 	
-	public static function getEnteredUsername() : String {
-		return ServerCrossPlatform.getParam(hiddenUsername);
+	public static function getEnteredUsername(ctx:IWebContext) : String {
+		return ctx.getParams().get(hiddenUsername);
 	}
 	
-	public static function setPwdOk() : Bool {
-		var pw1 = ServerCrossPlatform.getParam('hidden_newpw1');
-		var pw2 = ServerCrossPlatform.getParam('hidden_newpw2');
-		return ((pw1 == pw2) && passwordHashMatches(pw1));
+	public static function setPwdOk(ctx:IWebContext) : Bool {
+		var pw1 = ctx.getParams().get('hidden_newpw1');
+		var pw2 = ctx.getParams().get('hidden_newpw2');
+		return ((pw1 == pw2) && passwordHashMatches(pw1, ctx));
 	}
 	
-	public static function changePwdOk(oldPasswordHash:String) : Bool {
-		var pw1 = ServerCrossPlatform.getParam('hidden_newpw1');
-		var pw2 = ServerCrossPlatform.getParam('hidden_newpw2');
-		return ((pw1 == pw2) && passwordHashMatches(oldPasswordHash));
+	public static function changePwdOk(oldPasswordHash:String, ctx:IWebContext) : Bool {
+		var pw1 = ctx.getParams().get('hidden_newpw1');
+		var pw2 = ctx.getParams().get('hidden_newpw2');
+		return ((pw1 == pw2) && passwordHashMatches(oldPasswordHash, ctx));
 	}
 	
 	/**
@@ -271,25 +272,25 @@ class HalfSecureLogin
 	 * When action is "set" password, it can be called without parameters.
 	 * @param	?oldPasswordHash
 	 */
-	public static function getNewPasswordHash(?oldPasswordHash:String) {
-		var pwaction = getPasswordAction();
+	public static function getNewPasswordHash(?oldPasswordHash:String, ctx:IWebContext) {
+		var pwaction = getPasswordAction(ctx);
 		if (pwaction == 'set') {
-			if (!setPwdOk()) {
+			if (!setPwdOk(ctx)) {
 				throw "Set Password Not OK";
 			}
 		} else if (pwaction == 'change') {
-			if (!changePwdOk(oldPasswordHash)) {
+			if (!changePwdOk(oldPasswordHash, ctx)) {
 				throw "Change password Not OK";
 			}
 		} else {
 			throw "Passwordaction not specified";
 		}
-		return ServerCrossPlatform.getParam('hidden_newpw1');
+		return ctx.getParams().get('hidden_newpw1');
 	}
 	
-	public static function passwordHashMatches(passwordHash:String) : Bool {
-		var key:String = ServerCrossPlatform.getParam(hiddenLogonkey);
-		return (key == createLoginKey(getChallengeFromSession(), passwordHash));
+	public static function passwordHashMatches(passwordHash:String, ctx:IWebContext) : Bool {
+		var key:String = ctx.getParams().get(hiddenLogonkey);
+		return (key == createLoginKey(getChallengeFromSession(ctx), passwordHash));
 	}
 	
 	#end

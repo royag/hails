@@ -232,15 +232,31 @@ private class JdbcResultSet implements sys.db.ResultSet
 		return names == null ? 0 : names.length;
 	}
 
+	private var nextCalled:Bool = false;
+	
+	private function doNext() : Bool {
+		nextCalled = true;
+		try {
+			if (rs == null) {
+				return false;
+			}
+		return rs.next();
+		} catch(e:Dynamic) throw e;
+	}
+	
 	public function hasNext() : Bool
 	{
 		try {
-		return rs != null && rs.next();
+		return rs != null && doNext();
 		} catch(e:Dynamic) throw e;
 	}
 
 	public function next() : Dynamic
 	{
+		if (!nextCalled) {
+			doNext();
+		}
+		nextCalled = false;
 		try {
 			if (rs == null) return null;
 			var ret = {}, names = names, types = types;
@@ -250,9 +266,13 @@ private class JdbcResultSet implements sys.db.ResultSet
 				if (t == Types.FLOAT)
 				{
 					val = rs.getDouble(i+1);
-				} else if (t == Types.DATE || t == Types.TIME) {
-					var d:java.sql.Date = rs.getDate(i+1);
-					val = Date.fromTime(cast d.getTime());
+				} else if (t == Types.DATE || t == Types.TIME || t == Types.TIMESTAMP) {
+					var d:java.sql.Date = rs.getDate(i + 1);
+					if (d == null) {
+						val = null;
+					} else {
+						val = Date.fromTime(cast d.getTime());
+					}
 				} else if (t == Types.LONGVARBINARY || t == Types.VARBINARY || t == Types.BINARY || t == Types.BLOB) {
 					var b = rs.getBytes(i+1);
 					val = Bytes.ofData(b);
@@ -280,22 +300,31 @@ private class JdbcResultSet implements sys.db.ResultSet
 
 	public function getResult( n : Int ) : String
 	{
+		if (!nextCalled) {
+			doNext();
+		}
 		try {
-		return rs.getString(n);
+		return rs.getString(n+1);
 		} catch(e:Dynamic) throw e;
 	}
 
 	public function getIntResult( n : Int ) : Int
 	{
+		if (!nextCalled) {
+			doNext();
+		}
 		try {
-		return rs.getInt(n);
+		return rs.getInt(n+1);
 		} catch(e:Dynamic) throw e;
 	}
 
 	public function getFloatResult( n : Int ) : Float
 	{
+		if (!nextCalled) {
+			doNext();
+		}
 		try {
-		return rs.getFloat(n);
+		return rs.getFloat(n+1);
 		} catch(e:Dynamic) throw e;
 	}
 

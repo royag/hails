@@ -19,6 +19,14 @@ import sys.db.Mysql;
 #end
 import Type;
 import haxe.ds.StringMap;
+import haxe.io.Bytes;
+
+
+#if java
+typedef Blob = Bytes;
+#else
+typedef Blob = String;
+#end
 
 class HailsDbRecord extends hails.HailsBaseRecord {
 	public var id:Int;
@@ -128,6 +136,7 @@ class HailsDbRecord extends hails.HailsBaseRecord {
 	
 	static function createWhere(options:Dynamic, conn:Connection) : String {
 		//trace("OPTIONS:" + options + "<br>");
+		
 		if (options != null) {
 			if (Reflect.hasField(options, 'conditions')) {
 				var condArr:Array < Dynamic > = Reflect.field(options, 'conditions'); // e.g.: ["name = ?", 'roy'];
@@ -140,8 +149,12 @@ class HailsDbRecord extends hails.HailsBaseRecord {
 				var idx = condStr.indexOf('?');
 				while (idx > -1) {
 					Logger.logDebug('idx=' + idx);
+					var v:Dynamic = condArr[cnt];
+					if (Std.is(v, Bool)) {
+						v = (v ? "1" : "0");
+					}
 					condStr = condStr.substr(0, idx) + 
-						"'" + conn.escape(condArr[cnt]) + "'" +
+						/*"'" +*/ conn.escape(v) /*+ "'"*/ +
 						condStr.substr(idx + 1);
 					idx = condStr.indexOf('?');
 					cnt += 1;

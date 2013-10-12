@@ -4,14 +4,14 @@
  */
 
 package hails.util;
-import php.Session;
-import php.Web;
+//import php.Session;
+//import php.Web;
 import haxe.ds.StringMap;
 
 class ServerCrossPlatform 
 {
 
-	public static function setSession(key:String, val:Dynamic) {
+	/*public static function setSession(key:String, val:Dynamic) {
 		Session.set(key, val);
 	}
 	
@@ -25,6 +25,6 @@ class ServerCrossPlatform
 	
 	public static function getParam(param : String) : String {
 		return getParams().get(param);
-	}
+	}*/
 	
 }

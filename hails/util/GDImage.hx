@@ -4,6 +4,7 @@
 */
 
 package hails.util;
+import haxe.io.Bytes;
 
 class GDImage {
 
@@ -18,6 +19,8 @@ class GDImage {
 		
 	}
 	
+	#if php
+	
 	public static function createNew(width:Int, height:Int, ?bgColor:{r:Int,g:Int,b:Int}) : GDImage {
 		var ret = new GDImage();
 		ret.im = untyped __call__("@imagecreatetruecolor", width, height);
@@ -27,7 +30,7 @@ class GDImage {
 		return ret;
 	}
 	
-	public static function createFromString(data:String) : GDImage {
+	public static function createFromData(data:String) : GDImage {
 		var ret = new GDImage();
 		ret.im = untyped __call__('imagecreatefromstring', data);
 		return ret;
@@ -81,7 +84,7 @@ class GDImage {
 		return untyped __call__("imagejpeg", this.im);
 	}
 	
-	public function toPNGString() : String {
+	public function toPNGData() : String {
 		untyped __call__("ob_start");
 		var ok:Bool = untyped __call__("imagepng", this.im, null);
 		var ret:String = untyped __call__("ob_get_contents");
@@ -91,7 +94,7 @@ class GDImage {
 		return null;
 	}
 
-	public function toJPEGString() : String {
+	public function toJPEGData() : String {
 		untyped __call__("ob_start");
 		var ok:Bool = untyped __call__("imagejpeg", this.im, null);
 		var ret:String = untyped __call__("ob_get_contents");
@@ -145,4 +148,30 @@ class GDImage {
 			drawPixelRow(pixels[i], x, y + i, color);
 		}
 	}
+	#end
+	#if java
+	public static function createFromData(data:Bytes) : GDImage {
+		return new GDImage();
+	}
+	public function scaleByWidth(newX:Int) : GDImage {
+		return this;
+	}
+	public function getWidth() : Int {
+		return 0;
+	}
+	public function toPNGData() : Bytes {
+		return null;
+	}
+
+	public function toJPEGData() : Bytes {
+		return null;
+	}	
+
+	public function getHeight() : Int {
+		return 0;
+	}	
+	public function destroy() : Void {
+		return;
+	}	
+	#end
 }

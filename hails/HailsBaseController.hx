@@ -193,6 +193,7 @@ class HailsBaseController {
 		}
 		if (format == 'html') {
 			var html = getHtml(resolveHtmlViewName(viewAction), data, layout, callBacks);
+			WebCtx.setContentType("text/html");
 			WebCtx.print(html);
 		} else {
 			throw /*new Exception(*/"Unknown format: " + format; // );
@@ -202,6 +203,10 @@ class HailsBaseController {
 	function renderRaw(outputData) {
 		setAsRendered();
 		WebCtx.print(outputData);
+	}
+	function renderRawBinary(outputData) {
+		setAsRendered();
+		WebCtx.printBinary(outputData);
 	}
 	
 	#if php
