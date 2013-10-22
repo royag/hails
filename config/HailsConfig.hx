@@ -12,6 +12,8 @@ enum ApplicationControllers {
 }
 
 class HailsConfig {
+	public static var URL_SEP = "/";
+	
 	public static var phpViewRoot = "/personal/google_code/hails/view";
 	
 	public static function getLogFileName() : String {
@@ -26,17 +28,28 @@ class HailsConfig {
 	public static var defaultController = 'main';
 	
 	public static function getBaseUrl() : String {
+		#if php
 		return "/index.php/";
+		#end
+		#if java
+		return "/hailsdemo/Test/";
+		#else
+		return "/";
+		#end
+		//return "/hailsdemo/Test/";
+		//return "/";
+		
 	}
 	
 	public static function getUriScriptnameNo() : Int {
-		/*#if php
+		#if php
 		return 1;
 		#end
 		#if java
+		return 2;
+		#else
 		return 0;
-		#end*/
-		return 1;
+		#end
 	}
 	
 	public static function getResourceBaseUrl() : String {

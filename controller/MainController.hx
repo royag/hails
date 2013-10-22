@@ -26,7 +26,7 @@ class MainController extends HailsController
 		var s = "This is a test!";
 		var users = User.findAll();
 		for (u in users) {
-			s += u.username + ",";
+			s += u.username + "," + Std.string(u);
 		}
 		viewData = { theMessage:s };
 	}

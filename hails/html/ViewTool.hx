@@ -60,7 +60,7 @@ class ViewTool
 	
 	
 	public static function pathTo(controller:String, ?action:String, ?getParams:Dynamic) : String {
-		var ret:String = HailsConfig.getBaseUrl() + controller + (action == null ? "" : "/" + action);
+		var ret:String = HailsConfig.getBaseUrl() + controller + (action == null ? "" : HailsConfig.URL_SEP + action);
 		if (getParams != null) {
 			if (Type.getClass(getParams) == String) {
 				ret += "?" + getParams;

@@ -5,6 +5,9 @@ import hails.platform.IWebContext;
 #if php
 import hails.platform.PhpWebContext;
 #end
+#if neko
+import hails.platform.PhpWebContext;
+#end
 #if java
 import hails.platform.HailsServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -32,6 +35,9 @@ extends HailsServlet
 		#if php
 		ctx = new PhpWebContext();
 		#end
+		#if neko
+		ctx = new PhpWebContext();
+		#end		
 		handleRequest(ctx);
 	}
 	

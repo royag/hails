@@ -53,7 +53,7 @@ class HailsDbRecord extends hails.HailsBaseRecord {
 			return;
 		}
 		var resFields:Array<String> = Reflect.fields(dbResult);
-		var thisFields:Array<String> = Reflect.fields(this);
+		var thisFields:Array<String> = Type.getInstanceFields(Type.getClass(this)); // Reflect.fields(this);
 		this._fieldNames = new List<String>();
 		var camelizedField:String;
 		_joinedFields = new StringMap<String>();
@@ -154,7 +154,7 @@ class HailsDbRecord extends hails.HailsBaseRecord {
 						v = (v ? "1" : "0");
 					}
 					condStr = condStr.substr(0, idx) + 
-						/*"'" +*/ conn.escape(v) /*+ "'"*/ +
+						/*"'" +*/ escape(conn,v) /*+ "'"*/ +
 						condStr.substr(idx + 1);
 					idx = condStr.indexOf('?');
 					cnt += 1;
@@ -419,7 +419,7 @@ class HailsDbRecord extends hails.HailsBaseRecord {
 					}
 					fnString += StringUtil.tableize(fn);
 					if (val != null) {
-						valString += conn.escape(val); // "\"" + conn.escape(val) + "\"";
+						valString += escape(conn,val); // "\"" + conn.escape(val) + "\"";
 					} else {
 						valString += "NULL";
 					}
@@ -446,7 +446,7 @@ class HailsDbRecord extends hails.HailsBaseRecord {
 			conn = createConnection();
 		}
 		try {
-			var sql:String = "DELETE FROM " + tableName() + " WHERE ID = " + conn.escape(Std.string(id));
+			var sql:String = "DELETE FROM " + tableName() + " WHERE ID = " + escape(conn,Std.string(id));
 			runSql(sql, conn);
 		} catch (err:Dynamic) {
 			error = err;
@@ -494,7 +494,7 @@ class HailsDbRecord extends hails.HailsBaseRecord {
 						updateString += ",";
 					}
 					if (val != null) {
-						updateString += fname + " = '" + conn.escape(val) + "' ";
+						updateString += fname + " = '" + escape(conn,val) + "' ";
 					} else {
 						updateString += fname + " = NULL ";
 					}
@@ -554,5 +554,13 @@ class HailsDbRecord extends hails.HailsBaseRecord {
 			return false;
 			
 		}
+	}
+	
+	static function escape(conn:Connection, val:String) {
+		#if java
+		return conn.escape(val);
+		#else
+		return "'" + conn.escape(val) + "'";
+		#end
 	}
 }

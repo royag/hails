@@ -9,6 +9,9 @@ import config.HailsConfig;
 import hails.platform.IWebContext;
 import hails.util.StringUtil;
 import haxe.ds.StringMap;
+#if neko
+import neko.Lib;
+#end
 
 // ControllerConfig should import all controllers, just to make them compile...
 // (Because if there are no references (as they are loaded dynamically) they're not compiled.
@@ -21,14 +24,19 @@ class HailsDispatcher {
 		
 	}
 	
+	function log(s:String):Void {
+		//Lib.println(s);
+	}
+	
 	static var controllerClassPrefix:String = "controller.";
 	
 	function getUriPart(n:Int, ctx:IWebContext) : String {
 		var uri:String = ctx.getURI();
+		log("URI=["+uri+"]");
 		if (uri.charAt(uri.length - 1) == "/") {
 			uri = uri.substr(0, uri.length - 1);
 		}
-		var s:Array < String > = uri.split("/");
+		var s:Array < String > = uri.split(HailsConfig.URL_SEP);
 		if (s != null && s.length > n) {
 			return s[n];
 		}
@@ -91,6 +99,7 @@ class HailsDispatcher {
 	
 	function figureRoute(ctx:IWebContext) : Route {
 		var method:String = ctx.getMethod().toUpperCase();
+		//trace(ctx);
 		var params:StringMap<String> = ctx.getParams();
 		//trace(Web.getParamValues('_method'));
 		if (method == 'POST') {
@@ -149,8 +158,11 @@ class HailsDispatcher {
 	
 	function doHandleRequest(ctx:IWebContext) : Void {
 		try {
+			//trace(ctx);
 		var params:StringMap<String> = ctx.getParams();
 		var actionName:String = getActionName(ctx);
+				log(actionName);
+
 		//trace(actionName);
 		if (actionName == null) {
 			actionName = "";
@@ -161,13 +173,20 @@ class HailsDispatcher {
 			return;
 		}
 		var controllerId = getControllerUri(ctx);
+		log(controllerId);
 		//trace(controllerId);
 		if (controllerId == null) {
 			// default index
 			controllerId = HailsConfig.defaultController;
 		}
 		var fullControllerName = controllerClassPrefix + getControllerName(ctx);
+		
+		log("fullControllerName=" + fullControllerName);
+		
 		var controllerClass:Class<Dynamic> = Type.resolveClass(fullControllerName);
+		
+		log("controllerClass=" + Std.string(controllerClass));
+		
 		if (controllerClass != null) {
 			var constructorParams:Array<Dynamic> = [actionName, ctx];
 			var controller:HailsController = Type.createInstance(controllerClass, constructorParams);
@@ -182,16 +201,27 @@ class HailsDispatcher {
 		
 			var actionFound = false;
 			var actionMethodName = "action_" + actionName;
-			if (Reflect.hasField(controller, actionMethodName)) {
-				actionFound = true;
+			log("looking for field [" + actionMethodName + "]");
+			var fields = Type.getInstanceFields(controllerClass);
+			//ArrayTools.
+			actionFound = exists(fields, actionMethodName);
+			if (actionFound) { //Reflect.hasField(controller, actionMethodName)) {
+				//actionFound = true;
+				log("found field");
 			} else {
+				log("dit NOT find field .. try figure route");
+				
+				
+				var actionMethod = Reflect.field(controller, actionMethodName);
+				log("actionMethod=" + actionMethod);
+				
 				var route = figureRoute(ctx);
 				//trace(route);
 				if (route != null) {
 					actionMethodName = controller.route(route);
 					//trace(actionMethodName);
 					if (actionMethodName != null) {
-						if (Reflect.hasField(controller, actionMethodName)) {
+						if (exists(fields, actionMethodName)) { //Reflect.hasField(controller, actionMethodName)) {
 							controller.initialAction = actionMethodName;
 							actionFound = true;
 							actionName = actionMethodName;
@@ -232,6 +262,7 @@ class HailsDispatcher {
 				}
 			}
 		}
+		log("Unknown controller/action: " + controllerId + "/" + actionName);
 		Logger.logDebug("Unknown controller/action: " + controllerId + "/" + actionName);
 		pageNotFound(ctx);
 		//trace("PAGE NOT FOUND");
@@ -239,6 +270,15 @@ class HailsDispatcher {
 			Logger.logError("HailsDispatcher.handleRequest():" + anyError);
 			throw anyError;
 		}
+	}
+	
+	function exists(arr:Array<String>, s:String) : Bool {
+		for (ss in arr) {
+			if (s == ss) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	function doRender(hc:HailsController, ctx:IWebContext) {

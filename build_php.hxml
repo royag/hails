@@ -3,12 +3,12 @@
 -cp .
 
 --next
--js .\webroot\public\login.js
+-js .\nekowebroot\public\login.js
 -main hails.ext.HalfSecureLogin
 -cp .
 
 --next
--js .\webroot\public\hwiki.js
+-js .\nekowebroot\public\hwiki.js
 -main hails.ext.text.HWikiJavascript
 -cp .
 
