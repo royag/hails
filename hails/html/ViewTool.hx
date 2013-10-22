@@ -71,7 +71,7 @@ class ViewTool
 				while (it.hasNext()) {
 					key = it.next();
 					ret += (first ? "?" : "&");
-					ret += key + "=" + StringTools.urlEncode(Reflect.field(getParams, key));
+					ret += key + "=" + StringTools.urlEncode(Std.string(Reflect.field(getParams, key)));
 					first = false;
 				}
 			}

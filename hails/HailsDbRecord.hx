@@ -560,7 +560,7 @@ class HailsDbRecord extends hails.HailsBaseRecord {
 		#if java
 		return conn.escape(val);
 		#else
-		return "'" + conn.escape(val) + "'";
+		return "'" + conn.escape(Std.string(val)) + "'";
 		#end
 	}
 }

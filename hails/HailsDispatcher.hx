@@ -231,18 +231,23 @@ class HailsDispatcher {
 			}
 			if (actionFound) {
 				var actionMethod = Reflect.field(controller, actionMethodName);
+				//Reflect.callMethod(
+				log("WE SHALL CALL: " + actionMethodName);
+				log("METHOD: " + actionMethod);
 				if (Reflect.isFunction(actionMethod)) {
 					var hasError = false;
 					var theError:Dynamic;
 					try {
 						//trace("before CALLMETHOD");
 						var hc:HailsController = controller;
+						actionMethod = Reflect.field(hc, actionMethodName);
+						log("METHOD: " + actionMethod);
 						hc.controllerId = controllerId;
 						Logger.logInfo(controllerId + "." + actionMethodName);
 						controller.before(actionName);
 						// the before action might have rendered a redirect, for instance
 						if (!controller.hasRendered) {
-							Reflect.callMethod(hc, actionMethod, []); // []);
+							Reflect.callMethod(hc, actionMethod/*actionMethod*/, []); // []);
 							overriddenAction = hc.initialAction;
 							//trace("after CALLMETHOD");
 							if (!hc.hasRendered && hc.shouldRender) {
@@ -267,6 +272,7 @@ class HailsDispatcher {
 		pageNotFound(ctx);
 		//trace("PAGE NOT FOUND");
 		} catch (anyError:Dynamic) {
+			log(Std.string(anyError));
 			Logger.logError("HailsDispatcher.handleRequest():" + anyError);
 			throw anyError;
 		}

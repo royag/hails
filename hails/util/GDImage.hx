@@ -4,6 +4,7 @@
 */
 
 package hails.util;
+import hails.HailsDbRecord.Blob;
 import haxe.io.Bytes;
 
 class GDImage {
@@ -149,8 +150,8 @@ class GDImage {
 		}
 	}
 	#end
-	#if java
-	public static function createFromData(data:Bytes) : GDImage {
+	#if !php
+	public static function createFromData(data:Blob) : GDImage {
 		return new GDImage();
 	}
 	public function scaleByWidth(newX:Int) : GDImage {
@@ -159,11 +160,11 @@ class GDImage {
 	public function getWidth() : Int {
 		return 0;
 	}
-	public function toPNGData() : Bytes {
+	public function toPNGData() : Blob {
 		return null;
 	}
 
-	public function toJPEGData() : Bytes {
+	public function toJPEGData() : Blob {
 		return null;
 	}	
 
