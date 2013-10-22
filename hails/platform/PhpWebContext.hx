@@ -89,6 +89,7 @@ class Session {
         start();
         needCommit = true;
         sessionData.set(name, value);
+		commit();
     }
     
     public static function setCookieParams(?lifetime : Int, ?path : String, ?domain : String, ?secure : Bool, ?httponly : Bool) {
@@ -171,6 +172,7 @@ class Session {
       started = true;
       commit();
     }
+	Web.setCookie(sessionName, id);
     started = true;
     }
     
