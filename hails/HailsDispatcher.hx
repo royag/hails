@@ -24,15 +24,15 @@ class HailsDispatcher {
 		
 	}
 	
-	function log(s:String):Void {
+	/*function log(s:String):Void {
 		//Lib.println(s);
-	}
+	}*/
 	
 	static var controllerClassPrefix:String = "controller.";
 	
 	function getUriPart(n:Int, ctx:IWebContext) : String {
 		var uri:String = ctx.getURI();
-		log("URI=["+uri+"]");
+		//log("URI=["+uri+"]");
 		if (uri.charAt(uri.length - 1) == "/") {
 			uri = uri.substr(0, uri.length - 1);
 		}
@@ -161,7 +161,7 @@ class HailsDispatcher {
 			//trace(ctx);
 		var params:StringMap<String> = ctx.getParams();
 		var actionName:String = getActionName(ctx);
-				log(actionName);
+				//log(actionName);
 
 		//trace(actionName);
 		if (actionName == null) {
@@ -173,7 +173,7 @@ class HailsDispatcher {
 			return;
 		}
 		var controllerId = getControllerUri(ctx);
-		log(controllerId);
+		//log(controllerId);
 		//trace(controllerId);
 		if (controllerId == null) {
 			// default index
@@ -181,11 +181,11 @@ class HailsDispatcher {
 		}
 		var fullControllerName = controllerClassPrefix + getControllerName(ctx);
 		
-		log("fullControllerName=" + fullControllerName);
+		//log("fullControllerName=" + fullControllerName);
 		
 		var controllerClass:Class<Dynamic> = Type.resolveClass(fullControllerName);
 		
-		log("controllerClass=" + Std.string(controllerClass));
+		//log("controllerClass=" + Std.string(controllerClass));
 		
 		if (controllerClass != null) {
 			var constructorParams:Array<Dynamic> = [actionName, ctx];
@@ -201,19 +201,19 @@ class HailsDispatcher {
 		
 			var actionFound = false;
 			var actionMethodName = "action_" + actionName;
-			log("looking for field [" + actionMethodName + "]");
+			//log("looking for field [" + actionMethodName + "]");
 			var fields = Type.getInstanceFields(controllerClass);
 			//ArrayTools.
 			actionFound = exists(fields, actionMethodName);
 			if (actionFound) { //Reflect.hasField(controller, actionMethodName)) {
 				//actionFound = true;
-				log("found field");
+				//log("found field");
 			} else {
-				log("dit NOT find field .. try figure route");
+				//log("dit NOT find field .. try figure route");
 				
 				
 				var actionMethod = Reflect.field(controller, actionMethodName);
-				log("actionMethod=" + actionMethod);
+				//log("actionMethod=" + actionMethod);
 				
 				var route = figureRoute(ctx);
 				//trace(route);
@@ -232,8 +232,8 @@ class HailsDispatcher {
 			if (actionFound) {
 				var actionMethod = Reflect.field(controller, actionMethodName);
 				//Reflect.callMethod(
-				log("WE SHALL CALL: " + actionMethodName);
-				log("METHOD: " + actionMethod);
+				//log("WE SHALL CALL: " + actionMethodName);
+				//log("METHOD: " + actionMethod);
 				if (Reflect.isFunction(actionMethod)) {
 					var hasError = false;
 					var theError:Dynamic;
@@ -241,7 +241,7 @@ class HailsDispatcher {
 						//trace("before CALLMETHOD");
 						var hc:HailsController = controller;
 						actionMethod = Reflect.field(hc, actionMethodName);
-						log("METHOD: " + actionMethod);
+						//log("METHOD: " + actionMethod);
 						hc.controllerId = controllerId;
 						Logger.logInfo(controllerId + "." + actionMethodName);
 						controller.before(actionName);
@@ -267,12 +267,12 @@ class HailsDispatcher {
 				}
 			}
 		}
-		log("Unknown controller/action: " + controllerId + "/" + actionName);
+		//log("Unknown controller/action: " + controllerId + "/" + actionName);
 		Logger.logDebug("Unknown controller/action: " + controllerId + "/" + actionName);
 		pageNotFound(ctx);
 		//trace("PAGE NOT FOUND");
 		} catch (anyError:Dynamic) {
-			log(Std.string(anyError));
+			//log(Std.string(anyError));
 			Logger.logError("HailsDispatcher.handleRequest():" + anyError);
 			throw anyError;
 		}
