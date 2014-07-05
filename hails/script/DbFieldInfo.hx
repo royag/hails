@@ -4,6 +4,7 @@
 */
 
 package hails.script;
+import hails.config.DatabaseConfig;
 
 //import php.Exception;
 
@@ -33,7 +34,15 @@ class DbFieldInfo {
 		this.nullable = true;
 	}
 	
-	public function toMysqlColumnDefinition() : String {
+	public function toColumnDefinition() : String {
+		if (DatabaseConfig.getType() == "sqlserver") {
+			return toSqlServerColumnDefinition();
+		} else {
+			return toMysqlColumnDefinition();
+		}
+	}
+	
+	private function toMysqlColumnDefinition() : String {
 		var sql = "";
 		sql += switch(dbtype) {
 			case dbInt : "int";
@@ -63,6 +72,36 @@ class DbFieldInfo {
 		return sql;
 	}
 	
+	private function toSqlServerColumnDefinition() : String {
+		var sql = "";
+		sql += switch(dbtype) {
+			case dbInt : "int";
+			case dbString : "varchar";
+			case dbBoolean : "bit";
+			case dbDatetime : "datetime";
+			case dbFloat : "float";
+			case dbBlob : "varbinary(MAX)";
+			case dbMediumBlob : "varbinary(MAX)";
+			case dbLongBlob : "varbinary(MAX)";
+			case dbText : "text";
+		}
+		if (length > -1) {
+			sql += "(" + length + ")";
+		} else {
+			switch(dbtype) {
+				//case dbInt : sql += "(11)";
+				case dbString : sql += "(100)";
+				default : {	}
+			}
+		}
+		if (this.isId) {
+			sql += " IDENTITY(1,1)";
+		} else {
+			sql += " " + (nullable ? "" : "NOT ") + "NULL";
+		}
+		return sql;
+	}	
+	
 	// varchar(10)
 	public static function findLengthOfMysqlType(t:String) : Int {
 		var start = t.indexOf("(");
@@ -71,18 +110,61 @@ class DbFieldInfo {
 		}
 		var end = t.indexOf(")");
 		var len:Int = Std.parseInt(t.substr(start + 1, end - start - 1));
-		if (len == null) {
+		if (len <= 0) { // == null) {
 			throw "Could not parse int: " + t.substr(start + 1, end - start);
 			//return -1;
 		}
 		return len;
 		
 	}
-	public static function createFromMysqlDescription(desc:Dynamic) : DbFieldInfo {
+	
+	public static function createFromServerDescription(desc:Dynamic) : DbFieldInfo {
+		if (DatabaseConfig.getType() == "sqlserver") {
+			return createFromSqlServerDescription(desc);
+		}
+		return createFromMysqlDescription(desc);
+	}
+	
+	private static function createFromSqlServerDescription(desc:Dynamic) : DbFieldInfo {
+		//var fieldName:String = Reflect.field(f, "Field");
+		var mysqlType:String = Reflect.field(desc, "DATA_TYPE");
+		var nullable:String = Reflect.field(desc, "IS_NULLABLE"); // "YES" or "NO"
+		//var defaultVal:String = Reflect.field(desc, "Type"); // null		
+		var dbtype:DbFieldType;
+		if (StringTools.startsWith(mysqlType, "varchar")) {
+			dbtype = dbString;
+		} else if (StringTools.startsWith(mysqlType, "int")) {
+			dbtype = dbInt;
+		} else if (StringTools.startsWith(mysqlType, "datetime")) {
+			dbtype = dbDatetime;
+		} else if (StringTools.startsWith(mysqlType, "bit")) {
+			dbtype = dbBoolean;
+		} else if (StringTools.startsWith(mysqlType, "tinyint(1)")) {
+			dbtype = dbBoolean;
+		} else if (StringTools.startsWith(mysqlType, "float")) {
+			dbtype = dbFloat;
+		} else if (StringTools.startsWith(mysqlType, "varbinary")) {
+			dbtype = dbBlob;
+		} else if (StringTools.startsWith(mysqlType, "varbinary")) {
+			dbtype = dbMediumBlob;
+		} else if (StringTools.startsWith(mysqlType, "varbinary")) {
+			dbtype = dbLongBlob;
+		} else if (StringTools.startsWith(mysqlType, "text")) {
+			dbtype = dbText;
+		} else {
+			throw "unknown databasetype: " + mysqlType;
+		}
+		var t = new DbFieldInfo(dbtype);
+		t.length = findLengthOfMysqlType(mysqlType);
+		t.nullable = nullable == "YES";
+		return t;
+	}
+	
+	private static function createFromMysqlDescription(desc:Dynamic) : DbFieldInfo {
 		//var fieldName:String = Reflect.field(f, "Field");
 		var mysqlType:String = Reflect.field(desc, "Type");
 		var nullable:String = Reflect.field(desc, "Null"); // "YES" or "NO"
-		var defaultVal:String = Reflect.field(desc, "Type"); // null		
+		//var defaultVal:String = Reflect.field(desc, "Type"); // null		
 		var dbtype:DbFieldType;
 		if (StringTools.startsWith(mysqlType, "varchar")) {
 			dbtype = dbString;

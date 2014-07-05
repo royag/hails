@@ -4,7 +4,7 @@
  */
 
 package hails.html;
-import config.HailsConfig;
+import hails.config.HailsConfig;
 import hails.HailsBaseRecord;
 
 class ViewTool 

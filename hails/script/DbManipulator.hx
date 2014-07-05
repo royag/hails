@@ -5,41 +5,73 @@
 
 package hails.script;
 
-import config.DatabaseConfig;
+import hails.config.DatabaseConfig;
 import sys.db.Connection;
 import sys.db.ResultSet;
 import hails.HailsDbRecord;
 //import php.Exception;
+#if neko
 import neko.Lib;
+#end
+import hails.platform.Platform;
 
 
 class DbManipulator {
 
-	public static function output(msg:String) {
-		Lib.println(msg);
+	static function tName(name:String) : String {
+		if (DatabaseConfig.getType() == "sqlserver") {
+			return "[" + name + "]";
+		}
+		return name;
 	}
 	
+	static function isMysql() {
+		return DatabaseConfig.getType() == "mysql";
+	}
+	
+	static function isSqlServer() {
+		return DatabaseConfig.getType() == "sqlserver";
+	}
+	
+	public static function output(msg:String) {
+		Platform.println(msg);
+	}
+	
+	static function modifyColumnStmt() {
+		if (isSqlServer()) {
+			return "ALTER COLUMN";
+		}
+		return "MODIFY COLUMN";
+	}	
+	
 	static function modifyColumn(tableName:String, colName:String, desc:DbFieldInfo) {
-		runSql("ALTER TABLE " + tableName + " MODIFY COLUMN " + colName + " " + desc.toMysqlColumnDefinition());
+		runSql("ALTER TABLE " + tName(tableName) + " "+modifyColumnStmt()+" " + colName + " " + desc.toColumnDefinition());
+	}
+	
+	static function addColumnStmt() {
+		if (isSqlServer()) {
+			return "ADD";
+		}
+		return "ADD COLUMN";
 	}
 	
 	static function addColumn(tableName:String, colName:String, desc:DbFieldInfo) {
-		var sql = "ALTER TABLE " + tableName + " ADD COLUMN " + colName + " " + desc.toMysqlColumnDefinition();
+		var sql = "ALTER TABLE " + tName(tableName) + " "+addColumnStmt()+" " + colName + " " + desc.toColumnDefinition();
 		runSql(sql);
 	}
 	
 	static function removeColumn(tableName:String, colName:String) {
-		runSql("ALTER TABLE " + tableName + " DROP COLUMN " + colName);
+		runSql("ALTER TABLE " + tName(tableName) + " DROP COLUMN " + colName);
 	}
 	
 	static function createTable(tableName:String, fieldTypeHash:Map < String, DbFieldInfo > ) {
-		var sql = "CREATE TABLE " + tableName + " (";
+		var sql = "CREATE TABLE " + tName(tableName) + " (";
 		var first = true;
 		for (key in fieldTypeHash.keys()) {
 			if (!first) {
 				sql += ",";
 			}
-			sql += key + " " + fieldTypeHash.get(key).toMysqlColumnDefinition();
+			sql += key + " " + fieldTypeHash.get(key).toColumnDefinition();
 			first = false;
 		}
 		sql += ")";
@@ -93,24 +125,37 @@ class DbManipulator {
 	}
 	
 	static function getTables() : List<String> {
-		var res:ResultSet = runSql("SHOW TABLES");
+		var sql = "SHOW TABLES";
+		var field = "Tables_in_" + DatabaseConfig.getDatabase();
+		if (isSqlServer()) {
+			sql = "SELECT * FROM information_schema.tables where table_catalog = '" + DatabaseConfig.getDatabase() + "'";
+			field = "TABLE_NAME";
+		}
+		var res:ResultSet = runSql(sql);
 		var ret:List<String> = new List<String>();
 		while (res.hasNext()) {
 			var f = res.next();
-			var tableName:String = Reflect.field(f, "Tables_in_" + DatabaseConfig.database);
+			var tableName:String = Reflect.field(f, field);
 			ret.add(tableName);
 		}
 		return ret;
 	}
 	
 	static function getFieldsFrom(table:String) : Map < String, DbFieldInfo > {
-		var res:ResultSet = runSql("SHOW FIELDS FROM " + table);
+		var sql = "SHOW FIELDS FROM " + table;
+		var field = "Field";
+		if (isSqlServer()) {
+			sql = "SELECT * FROM information_schema.columns where table_catalog = '" + DatabaseConfig.getDatabase() + 
+			"' and table_name = '" + table + "'";
+			field = "COLUMN_NAME";
+		}		
+		var res:ResultSet = runSql(sql);
 		var ret = new Map < String, DbFieldInfo >();
 		while (res.hasNext()) {
 			var f = res.next();
 			//trace(f);
-			var fieldName:String = Reflect.field(f, "Field");
-			ret.set(fieldName, DbFieldInfo.createFromMysqlDescription(f));
+			var fieldName:String = Reflect.field(f, field);
+			ret.set(fieldName, DbFieldInfo.createFromServerDescription(f));
 			//Lib.println(fieldName + " -> " + fieldType);
 		}
 		return ret;

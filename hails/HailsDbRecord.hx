@@ -5,7 +5,7 @@
 
 package hails;
 
-import config.DatabaseConfig;
+import hails.config.DatabaseConfig;
 //import controller.UserController;
 import hails.util.StringUtil;
 import sys.db.Connection;
@@ -13,6 +13,7 @@ import sys.db.Object;
 import sys.db.ResultSet;
 #if java
 import javaext.db.Mysql;
+import javaext.db.SqlServer;
 #end
 #if !java
 import sys.db.Mysql;
@@ -103,7 +104,11 @@ class HailsDbRecord extends hails.HailsBaseRecord {
 	}
 
 	public static function tableNameForClass < T > (c:Class < T > ) : String {
-		return hails.util.StringUtil.tableize(hails.util.StringUtil.removePackageNameFromClassName(Type.getClassName(c)));
+		var n = hails.util.StringUtil.tableize(hails.util.StringUtil.removePackageNameFromClassName(Type.getClassName(c)));
+		if (DatabaseConfig.getType() == "sqlserver") {
+			n = "[" + n + "]";
+		}
+		return n;
 	}
 	
 	public function tableName() : String {
@@ -327,19 +332,22 @@ class HailsDbRecord extends hails.HailsBaseRecord {
 	private static var connection:Connection;
 	
 	public static function createConnection() : Connection {
-		/*if (connection == null) {
-			trace("CONNECTION IS NULL");
-			trace(connection);*/
-		  var connection = Mysql.connect( 
-			{ user : DatabaseConfig.user,
-				socket : DatabaseConfig.socket,
-				pass : DatabaseConfig.password,
-				host : DatabaseConfig.host,
-				port : DatabaseConfig.port,
-			database : DatabaseConfig.database } );
-		/*}
-			trace("CONNECTION IS NOT NULL");
-			trace(connection);*/
+		var params = { user : DatabaseConfig.getUser(),
+				socket : '',
+				pass : DatabaseConfig.getPassword(),
+				host : DatabaseConfig.getHost(),
+				port : DatabaseConfig.getPort(),
+			database : DatabaseConfig.getDatabase() };
+		var connType = DatabaseConfig.getType();
+		if (connType == "sqlserver") {
+			#if java
+			return SqlServer.connect(params);
+			#else
+			throw "Unsupported sql connection type: " + connType;
+			#end
+		} else if (connType == "mysql") {
+			return Mysql.connect(params);
+		}
 		return connection;
 	}
 	

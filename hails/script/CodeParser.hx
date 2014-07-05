@@ -7,8 +7,9 @@ package hails.script;
 
 import hails.util.StringUtil;
 import sys.io.File;
-import neko.Lib;
-
+//import neko.Lib;
+import hails.platform.Platform;
+//import java.Lib;
 class CodeParser {
 
 	var rootDir:String;
@@ -21,7 +22,7 @@ class CodeParser {
 	
 	public function output(s:String) : Void {
 		if (doOutput) {
-			Lib.println(s);
+			Platform.println(s);
 		}
 	}
 	

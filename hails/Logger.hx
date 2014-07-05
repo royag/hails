@@ -4,7 +4,7 @@
  */
 
 package hails;
-import config.HailsConfig;
+import hails.config.HailsConfig;
 import haxe.io.Output;
 import sys.io.File;
 

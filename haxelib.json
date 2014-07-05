@@ -1,0 +1,11 @@
+{
+	"name": "hails",
+	"url": "http://github.com/openfl/lime",
+	"license": "MIT",
+	"tags": [],
+	"description": "A lightweight web framework for Haxe with PHP or Java",
+	"version": "0.0.2",
+	"releasenote": "Initial",
+	"contributors": [ "roy" ],
+	"dependencies": {}
+}

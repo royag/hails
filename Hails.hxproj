@@ -16,11 +16,13 @@
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>
     <class path="." />
+    <class path="script/src" />
   </classpaths>
   <!-- Build options -->
   <build>
     <option directives="" />
     <option flashStrict="False" />
+    <option noInlineOnDebug="False" />
     <option mainClass="" />
     <option enabledebug="False" />
     <option additional="" />
@@ -38,7 +40,7 @@
     <hidden path="obj" />
   </hiddenPaths>
   <!-- Executed before build -->
-  <preBuildCommand>haxe .\build_project.hxml</preBuildCommand>
+  <preBuildCommand>haxe script\build.hxml</preBuildCommand>
   <!-- Executed after build -->
   <postBuildCommand alwaysRun="False" />
   <!-- Other project options -->

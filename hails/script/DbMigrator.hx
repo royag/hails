@@ -10,10 +10,14 @@ import sys.FileSystem;
 //import php.Session;
 
 import sys.io.File;
+#if neko
 import neko.Lib;
+#else
+#end
+import hails.platform.Platform;
 //import sys.Sys;
 
-class Main {
+class DbMigrator {
 
 	//static var rootDir:String = "C:/projects/hails/src/";
 
@@ -22,21 +26,22 @@ class Main {
 	}
 	
 	public static function main() {
-		if (Sys.args().length > 0) {
-			if (Sys.args()[0] == "migrate") {
+		//trace(haxe.Resource.getString("dbconfig"));
+		//if (Sys.args().length > 0) {
+		//	if (Sys.args()[0] == "migrate") {
 				migrateDatabase();
-			} else {
-				showHelp();
-			}
-		} else {
-				showHelp();
-		}
+		//	} else {
+		//		showHelp();
+		//	}
+		//} else {
+		//		showHelp();
+		//}
 	}
 	
 	public static function showHelp() {
-			Lib.println("Usage: hailsgen [command]\n");
-			Lib.println("Commands:");
-			Lib.println("     migrate       migrate database");
+			Platform.println("Usage: hailsgen [command]\n");
+			Platform.println("Commands:");
+			Platform.println("     migrate       migrate database");
 	}
 	
 	public static function migrateDatabase() {
@@ -46,14 +51,14 @@ class Main {
 		for (fn in FileSystem.readDirectory(modelDir)) {
 			if (StringTools.endsWith(fn, ".hx")) {
 				var modelName = fn.substr(0, fn.length - 3);
-				Lib.println("----------------|" + modelName);
+				Platform.println("----------------|" + modelName);
 				var h:Map < String, DbFieldInfo > = cparser.findPublicProperties("model." + modelName, null);
 				DbManipulator.createOrAlterTable(StringUtil.tableize(modelName), h);
 				count += 1;
 			}
 		}
 		if (count == 0) {
-			Lib.println("Found no models to migrate in " + modelDir);
+			Platform.println("Found no models to migrate in " + modelDir);
 		}
 	}
 	

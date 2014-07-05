@@ -5,13 +5,12 @@
 
 package hails;
 
-import config.HailsConfig;
+import hails.config.HailsConfig;
 import hails.html.ViewTool;
 import hails.util.StringUtil;
 import haxe.Template;
 import sys.io.File;
 import hails.platform.IWebContext;
-
 
 class HailsBaseController {
 	var WebCtx:IWebContext;
@@ -73,14 +72,14 @@ class HailsBaseController {
 			throw /*new Exception(*/"No action to render";// );
 		}
 		if (action.indexOf("/") < 0) {
-			return config.HailsConfig.phpViewRoot + "/" + controllerId + "/" + action;
+			return HailsConfig.phpViewRoot + "/" + controllerId + "/" + action;
 		} else {
 			return HailsConfig.phpViewRoot + "/" + action;
 		}
 	}
 	
 	private function resolveLayoutHtmlFile(layout:String) {
-		return config.HailsConfig.phpViewRoot + "/layout/" + layout + ".html";
+		return HailsConfig.phpViewRoot + "/layout/" + layout + ".html";
 	}
 	
 	private function resolvePhpViewName(action:String) {

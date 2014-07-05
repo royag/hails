@@ -3,7 +3,7 @@
 * @author Default
 */
 
-package config;
+package hails.config;
 import hails.HailsController;
 import hails.Logger;
 
