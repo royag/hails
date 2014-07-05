@@ -1,0 +1,4 @@
+-main RunScript
+-neko ../run.n
+-lib hails
+-cp src

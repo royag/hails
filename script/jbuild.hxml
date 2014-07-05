@@ -1,0 +1,4 @@
+-main hails.script.DbMigrator
+-java ../jrunner
+-lib hails
+-cp src
