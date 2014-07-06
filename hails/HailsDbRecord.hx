@@ -6,6 +6,9 @@
 package hails;
 
 import hails.config.DatabaseConfig;
+#if (neko || php)
+import sys.db.Sqlite;
+#end
 //import controller.UserController;
 import hails.util.StringUtil;
 import sys.db.Connection;
@@ -266,7 +269,9 @@ class HailsDbRecord extends hails.HailsBaseRecord {
 			error = err;
 		}
 		if (!hadConn) {
-			conn.close();
+			if (!DatabaseConfig.isSqlite()) {
+				conn.close();
+			}
 		}
 		if (error != null) {
 			throw error;
@@ -302,7 +307,9 @@ class HailsDbRecord extends hails.HailsBaseRecord {
 			error = err;
 		}
 		if (!hadConn) {
-			conn.close();
+			if (!DatabaseConfig.isSqlite()) {
+				conn.close();
+			}
 		}
 		if (error != null) {
 			throw error;
@@ -341,19 +348,27 @@ class HailsDbRecord extends hails.HailsBaseRecord {
 		var connType = DatabaseConfig.getType();
 		if (connType == "sqlserver") {
 			#if java
-			return SqlServer.connect(params);
+			connection = SqlServer.connect(params);
 			#else
 			throw "Unsupported sql connection type: " + connType;
 			#end
 		} else if (connType == "mysql") {
-			return Mysql.connect(params);
+			connection = Mysql.connect(params);
+		} 
+		#if (php || neko)
+		else if (connType == "sqlite") {
+			connection = Sqlite.open(DatabaseConfig.getDatabase() + ".db");
 		}
+		#end
+		//trace(connection);
 		return connection;
 	}
 	
 	public static function closeConnection() {
 		if (connection != null) {
-			connection.close();
+			if (!DatabaseConfig.isSqlite()) {
+				connection.close();
+			}
 		}
 	}
 	
@@ -440,7 +455,9 @@ class HailsDbRecord extends hails.HailsBaseRecord {
 			error = err;
 		}
 		if (!hadConn) {
-			conn.close();
+			if (!DatabaseConfig.isSqlite()) {
+				conn.close();
+			}
 		}
 		if (error != null) {
 			throw error;
@@ -460,7 +477,9 @@ class HailsDbRecord extends hails.HailsBaseRecord {
 			error = err;
 		}
 		if (!hadConn) {
-			conn.close();
+			if (!DatabaseConfig.isSqlite()) {
+				conn.close();
+			}
 		}
 		if (error != null) {
 			_error = error;
@@ -515,7 +534,9 @@ class HailsDbRecord extends hails.HailsBaseRecord {
 			error = err;
 		}
 		if (!hadConn) {
-			conn.close();
+			if (!DatabaseConfig.isSqlite()) {
+				conn.close();
+			}
 		}
 		if (error != null) {
 			throw error;

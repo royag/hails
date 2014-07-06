@@ -25,12 +25,15 @@ class DbManipulator {
 		return name;
 	}
 	
-	static function isMysql() {
+	public static function isMysql() {
 		return DatabaseConfig.getType() == "mysql";
 	}
 	
-	static function isSqlServer() {
+	public static function isSqlServer() {
 		return DatabaseConfig.getType() == "sqlserver";
+	}
+	public static function isSqlite() {
+		return DatabaseConfig.getType() == "sqlite";
 	}
 	
 	public static function output(msg:String) {
@@ -45,6 +48,10 @@ class DbManipulator {
 	}	
 	
 	static function modifyColumn(tableName:String, colName:String, desc:DbFieldInfo) {
+		if (isSqlite()) {
+			Platform.println("Cannot modify column in sqlite");
+			return;
+		}
 		runSql("ALTER TABLE " + tName(tableName) + " "+modifyColumnStmt()+" " + colName + " " + desc.toColumnDefinition());
 	}
 	
@@ -61,6 +68,10 @@ class DbManipulator {
 	}
 	
 	static function removeColumn(tableName:String, colName:String) {
+		if (isSqlite()) {
+			Platform.println("Cannot remove column in sqlite");
+			return;
+		}
 		runSql("ALTER TABLE " + tName(tableName) + " DROP COLUMN " + colName);
 	}
 	
@@ -87,6 +98,7 @@ class DbManipulator {
 		connection = HailsDbRecord.createConnection();
 		try {
 			if (getTables().filter(function(s:String) { 
+				trace(s);
 					return s.toLowerCase() == tableName.toLowerCase(); 
 				} ).isEmpty()) {
 				// table doesnt exist
@@ -131,10 +143,15 @@ class DbManipulator {
 			sql = "SELECT * FROM information_schema.tables where table_catalog = '" + DatabaseConfig.getDatabase() + "'";
 			field = "TABLE_NAME";
 		}
+		if (isSqlite()) {
+			sql = "SELECT * FROM main.sqlite_master WHERE type = 'table'";
+			field = "tbl_name";
+		}
 		var res:ResultSet = runSql(sql);
 		var ret:List<String> = new List<String>();
 		while (res.hasNext()) {
 			var f = res.next();
+			trace(f);
 			var tableName:String = Reflect.field(f, field);
 			ret.add(tableName);
 		}
@@ -148,12 +165,16 @@ class DbManipulator {
 			sql = "SELECT * FROM information_schema.columns where table_catalog = '" + DatabaseConfig.getDatabase() + 
 			"' and table_name = '" + table + "'";
 			field = "COLUMN_NAME";
-		}		
+		}
+		if (isSqlite()) {
+			sql = "pragma table_info(user)";
+			field = "name";
+		}
 		var res:ResultSet = runSql(sql);
 		var ret = new Map < String, DbFieldInfo >();
 		while (res.hasNext()) {
 			var f = res.next();
-			//trace(f);
+			trace(f);
 			var fieldName:String = Reflect.field(f, field);
 			ret.set(fieldName, DbFieldInfo.createFromServerDescription(f));
 			//Lib.println(fieldName + " -> " + fieldType);

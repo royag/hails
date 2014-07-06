@@ -35,4 +35,15 @@ class DatabaseConfig {
 		return ConfigReader.getConfig("dbconfig").get("host");
 	}
 	
+	public static function isMysql() {
+		return DatabaseConfig.getType() == "mysql";
+	}
+	
+	public static function isSqlServer() {
+		return DatabaseConfig.getType() == "sqlserver";
+	}
+	public static function isSqlite() {
+		return DatabaseConfig.getType() == "sqlite";
+	}	
+	
 }

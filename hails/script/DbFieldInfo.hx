@@ -37,10 +37,42 @@ class DbFieldInfo {
 	public function toColumnDefinition() : String {
 		if (DatabaseConfig.getType() == "sqlserver") {
 			return toSqlServerColumnDefinition();
+		} else if (DatabaseConfig.getType() == "sqlite") {
+			return toSqliteColumnDefinition();
 		} else {
 			return toMysqlColumnDefinition();
 		}
 	}
+	
+	private function toSqliteColumnDefinition() : String {
+		var sql = "";
+		sql += switch(dbtype) {
+			case dbInt : "integer";
+			case dbString : "varchar";
+			case dbBoolean : "boolean";
+			case dbDatetime : "datetime";
+			case dbFloat : "float";
+			case dbBlob : "blob";
+			case dbMediumBlob : "mediumblob";
+			case dbLongBlob : "longblob";
+			case dbText : "text";
+		}
+		/*if (length > -1) {
+			sql += "(" + length + ")";
+		} else {
+			switch(dbtype) {
+				case dbInt : sql += "(11)";
+				case dbString : sql += "(100)";
+				default : {	}
+			}
+		}*/
+		if (this.isId) {
+			sql += " PRIMARY KEY AUTOINCREMENT";
+		} else {
+			sql += " " + (nullable ? "" : "NOT ") + "NULL";
+		}
+		return sql;
+	}	
 	
 	private function toMysqlColumnDefinition() : String {
 		var sql = "";
@@ -121,6 +153,8 @@ class DbFieldInfo {
 	public static function createFromServerDescription(desc:Dynamic) : DbFieldInfo {
 		if (DatabaseConfig.getType() == "sqlserver") {
 			return createFromSqlServerDescription(desc);
+		} else if (DatabaseConfig.getType() == "sqlite") {
+			return createFromSqliteDescription(desc);
 		}
 		return createFromMysqlDescription(desc);
 	}
@@ -159,6 +193,41 @@ class DbFieldInfo {
 		t.nullable = nullable == "YES";
 		return t;
 	}
+	
+	private static function createFromSqliteDescription(desc:Dynamic) : DbFieldInfo {
+		//var fieldName:String = Reflect.field(f, "Field");
+		var mysqlType:String = Reflect.field(desc, "type");
+		//var nullable:String = Reflect.field(desc, "Null"); // "YES" or "NO"
+		//var defaultVal:String = Reflect.field(desc, "Type"); // null		
+		var dbtype:DbFieldType;
+		if (StringTools.startsWith(mysqlType, "varchar")) {
+			dbtype = dbString;
+		} else if (StringTools.startsWith(mysqlType, "integer")) {
+			dbtype = dbInt;
+		} else if (StringTools.startsWith(mysqlType, "datetime")) {
+			dbtype = dbDatetime;
+		} else if (StringTools.startsWith(mysqlType, "boolean")) {
+			dbtype = dbBoolean;
+		} else if (StringTools.startsWith(mysqlType, "tinyint(1)")) {
+			dbtype = dbBoolean;
+		} else if (StringTools.startsWith(mysqlType, "float")) {
+			dbtype = dbFloat;
+		} else if (StringTools.startsWith(mysqlType, "blob")) {
+			dbtype = dbBlob;
+		} else if (StringTools.startsWith(mysqlType, "mediumblob")) {
+			dbtype = dbMediumBlob;
+		} else if (StringTools.startsWith(mysqlType, "longblob")) {
+			dbtype = dbLongBlob;
+		} else if (StringTools.startsWith(mysqlType, "text")) {
+			dbtype = dbText;
+		} else {
+			throw "unknown databasetype: " + mysqlType;
+		}
+		var t = new DbFieldInfo(dbtype);
+		t.length = findLengthOfMysqlType(mysqlType);
+		t.nullable = true; // nullable == "YES";
+		return t;
+	}	
 	
 	private static function createFromMysqlDescription(desc:Dynamic) : DbFieldInfo {
 		//var fieldName:String = Reflect.field(f, "Field");
