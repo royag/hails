@@ -20,6 +20,8 @@ class HailsBuilder
 			buildJava(hailsPath, workPath, args);
 		} else if (target == "php") {
 			buildPhp(hailsPath, workPath, args);
+		} else if (target == "neko") {
+			buildNeko(hailsPath, workPath, args);
 		}
 	}
 	
@@ -62,6 +64,25 @@ class WebApp extends Main
 	}	
 }
 		 */
+	}
+	
+	
+	public static function buildNeko(hailsPath:String, workPath:String, args:Array<String>) {
+		RunScript.mkdir("nekoout");
+		var haxeArgs = ["-neko", "./nekoout/index.n", "-main", "controller.WebApp", "-cp", ".", "-lib", "hails"];
+		
+		haxeArgs.push("-resource");
+		haxeArgs.push("config/dbconfig@dbconfig"); // !NB!: .pl(perl)-extension so it (usually) won't be able to load directly from webroot
+		
+		//RunScript.removeDirectory("phpout/res");
+		RunScript.runCommand(workPath, "haxe", haxeArgs);
+		
+		if (args.length > 2 && args[2] == "run") {
+			var nekoArgs = ["server", "-p", "2000", "-h", "localhost", "-d", "nekoout", "-rewrite"];
+			RunScript.runCommand(workPath, "nekotools", nekoArgs);
+		}
+		
+		//RunScript.recursiveCopy("view", "phpout/res/view", null, ".pl", "phpout/res/"); // !NB!: .pl(perl)-extension so it (usually) won't be able to load directly from webroot
 	}
 	
 	public static function buildPhp(hailsPath:String, workPath:String, args:Array<String>) {

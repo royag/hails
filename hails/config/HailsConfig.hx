@@ -15,19 +15,18 @@ class HailsConfig {
 	public static var URL_SEP = "/";
 	
 	public static function loadViewAsResource() {
-		/*#if java
-		return true;
-		#else
+		#if neko
 		return false;
-		#end*/
+		#else
 		return true;
+		#end
 	}
 	
 	public static function getViewRoot() {
 		if (loadViewAsResource()) {
 			return "";
 		} else {
-			return "/personal/google_code/hails/view";
+			return "view";
 		}
 	}
 	

@@ -57,7 +57,7 @@ class RunScript {
 			
 		}
 		hailsDir = Sys.getCwd();
-		trace(args);
+		//trace(args);
 		
 		if (FileSystem.exists (lastArgument) && FileSystem.isDirectory (lastArgument)) {
 			
@@ -88,6 +88,9 @@ class RunScript {
 			}
 		} else if (args[0] == "build") {
 			HailsBuilder.build(hailsDir, workDir, args);
+		} else if (args[0] == "run") {
+			// alias for "build neko run"
+			HailsBuilder.build(hailsDir, workDir, ["build", "neko", "run"]);
 		} else if (args[0] == "create") {
 			HailsCreator.create(hailsDir, workDir, args);
 		}
