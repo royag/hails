@@ -18,7 +18,8 @@ public static function connect( params : {
 if ( params.port == null ) params.port = 1433;
 
 try
-{
+{//Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+	untyped __java__("java.lang.Class.forName(\"com.microsoft.sqlserver.jdbc.SQLServerDriver\");");
 	trace("connect!!!!!");
 //java.lang.Class.forName("com.mysql.jdbc.Driver");
 //untyped __java__("java.lang.Class.forName(\"com.mysql.jdbc.Driver\");");

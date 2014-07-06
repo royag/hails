@@ -56,13 +56,19 @@ class JavaWebContext implements IWebContext
 		return this._outStream;
 	}
 	public function getParams() : StringMap<String> {
-		var map:java.util.Map<String,NativeArray<String>> = request.getParameterMap();
+		var a:NativeArray<String> = null;
+		var b:java.util.Map < String, NativeArray<String> > = null;
+		var m = request.getParameterMap();
+		// HAXE bug: java.util.Map<String,NativeArray<String>> resolves to Map<String,Object[]>
+		//var map :java.util.Map<String,NativeArray<String>> = request.getParameterMap();
 		var ret = new StringMap<String>();
-		var keys:java.util.Set<String> = map.keySet();
+		var keys:java.util.Set<String> = untyped __java__("((java.util.Map<String,String[]>)m).keySet()");
+		//map.keySet();
 		var it:java.util.Iterator<Dynamic> = cast(keys.iterator(), java.util.Iterator<Dynamic>);
 		while (it.hasNext()) {
 			var k = it.next();
-			ret.set(k.toString(), map.get(k)[0].toString());
+			//ret.set(k.toString(), map.get(k)[0].toString());
+			ret.set(k.toString(), untyped __java__("((java.util.Map<String,String[]>)m).get(k)[0].toString()"));
 		}
 		return ret;
 		//return JavaWebContext.toStringMap(request.getParameterMap());

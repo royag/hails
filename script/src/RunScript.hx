@@ -63,7 +63,7 @@ class RunScript {
 			Sys.setCwd (lastArgument);
 			args.pop ();
 		}
-		
+		var workDir = lastArgument;
 		Platform.println("HAILS 0.0.2");
 		Platform.println(lastArgument);
 		Platform.println(hailsDir);
@@ -83,55 +83,37 @@ class RunScript {
 			trace(args);
 			runCommand(null, "java", args);
 			#end
+		} else if (args[0] == "build") {
+			HailsBuilder.build(hailsDir, workDir, args);
 		}
 	}
 	
 	public static function runCommand (path:String, command:String, args:Array<String>, throwErrors:Bool = true):Int {
-		
 		var oldPath:String = "";
-		
 		if (path != null && path != "") {
-			
 			//trace ("cd " + path);
-			
 			oldPath = Sys.getCwd ();
-			
 			try {
-				
 				Sys.setCwd (path);
-				
 			} catch (e:Dynamic) {
-				
 				trace ("Cannot set current working directory to \"" + path + "\"");
-				
 			}
-			
 		}
 		
 		//trace (command + (args==null ? "": " " + args.join(" ")) );
-		
 		var result:Dynamic = Sys.command (command, args);
 		
 		//if (result == 0)
 		//	trace("Ok.");
-			
 		
 		if (oldPath != "") {
-			
 			Sys.setCwd (oldPath);
-			
 		}
 		
 		if (throwErrors && result != 0) {
-			
 			Sys.exit (1);
 			//throw ("Error running: " + command + " " + args.join (" ") + " [" + path + "]");
-			
 		}
-		
 		return result;
-		
 	}	
-	
-
 }
