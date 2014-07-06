@@ -68,6 +68,7 @@ class WebApp extends Main
 	
 	
 	public static function buildNeko(hailsPath:String, workPath:String, args:Array<String>) {
+		createWebAppHx(hailsPath, workPath);
 		RunScript.mkdir("nekoout");
 		var haxeArgs = ["-neko", "./nekoout/index.n", "-main", "controller.WebApp", "-cp", ".", "-lib", "hails"];
 		
@@ -86,6 +87,7 @@ class WebApp extends Main
 	}
 	
 	public static function buildPhp(hailsPath:String, workPath:String, args:Array<String>) {
+		createWebAppHx(hailsPath, workPath);
 		var haxeArgs = ["-php", "phpout", "-main", "controller.WebApp", "-cp", ".", "-lib", "hails"];
 		
 		haxeArgs.push("-resource");

@@ -1,6 +1,6 @@
-type: sqlserver
-port: 64802
+type: sqlite
+port: 
 dbname: mytest
-username: sa
-password: Test12345
-host: localhost
+username: 
+password: 
+host: 
