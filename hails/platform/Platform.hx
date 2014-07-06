@@ -18,8 +18,13 @@ class Platform
 	}
 	
 	public static function println(s:String) {
-		//Lib.println(s);
+		#if neko
+		Lib.println(s);
+		#elseif java
+		java.lang.System.out.println(s);
+		#else
 		trace(s);
+		#end
 	}
 	
 }

@@ -24,6 +24,30 @@ class HailsBuilder
 	}
 	
 	public static function createWebAppHx(hailsPath:String, workPath:String) {
+		
+		var webAppHx = "package controller;\n" +
+			"import hails.Main;\n";
+
+		var directory = "controller";
+		if (FileSystem.exists (directory) && FileSystem.isDirectory (directory)) {
+			for (file in FileSystem.readDirectory (directory)) {
+				var i = file.indexOf(".hx");
+				if (i > 0) {
+					var className = file.substring(0, i);
+					webAppHx += "import controller." + className + ";\n";
+				}
+			}
+		}
+		
+		webAppHx +=
+			"class WebApp extends Main\n" +
+			"{\n"+
+			"	static function main(){\n"+
+			"		hails.Main.main();\n"+
+			"	}	\n"+
+			"}";
+		
+		File.saveContent("controller/WebApp.hx", webAppHx);
 		// go through controller-dir to find all controllers
 		// create "controller/WebApp.hx" :
 		/*
@@ -94,7 +118,7 @@ class WebApp extends Main
 		RunScript.runCommand(workPath, javaHome + "/bin/jar.exe", ["cvf", warFile, "-C", "javaout/war/", "."]);
 	}
 	
-	static function appNameFromWorkPath(workPath:String) {
+	public static function appNameFromWorkPath(workPath:String) {
 		var slashI = workPath.lastIndexOf("/");
 		var backslashI = workPath.lastIndexOf("\\");
 		var lastSlash = (slashI > backslashI ? slashI : backslashI);

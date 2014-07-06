@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import hails.platform.JavaWebContext;
 #end
 
-import config.DatabaseConfig;
+//import config.DatabaseConfig;
 
 class Main 
 #if java

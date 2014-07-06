@@ -1,0 +1,6 @@
+type: sqlserver
+port: 64802
+dbname: mytest
+username: sa
+password: Test12345
+host: localhost

@@ -81,11 +81,13 @@ class RunScript {
 			var sqlJar = mysqlJar + ";" + sqlserverJar;
 
 			var args = ["-cp", hailsDir + "jrunner/DbMigrator.jar;config" + ";" + sqlJar, "hails.script.DbMigrator"];
-			trace(args);
+			//trace(args);
 			runCommand(null, "java", args);
 			#end
 		} else if (args[0] == "build") {
 			HailsBuilder.build(hailsDir, workDir, args);
+		} else if (args[0] == "create") {
+			HailsCreator.create(hailsDir, workDir, args);
 		}
 	}
 	

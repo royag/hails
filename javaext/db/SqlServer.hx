@@ -20,7 +20,7 @@ if ( params.port == null ) params.port = 1433;
 try
 {//Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
 	untyped __java__("java.lang.Class.forName(\"com.microsoft.sqlserver.jdbc.SQLServerDriver\");");
-	trace("connect!!!!!");
+	//trace("connect!!!!!");
 //java.lang.Class.forName("com.mysql.jdbc.Driver");
 //untyped __java__("java.lang.Class.forName(\"com.mysql.jdbc.Driver\");");
 //var tmp = java.lang.Class.forName("com.mysql.jdbc.Driver");
@@ -28,9 +28,9 @@ var cnxString = 'jdbc:sqlserver://' + params.host + ':' + Std.string(params.port
 var properties = new java.util.Properties();
 properties.put("user", params.user);
 properties.put("password", params.pass);
-trace("establish conn");
+//trace("establish conn");
 var cnx = java.sql.DriverManager.getConnection(cnxString, properties);
-trace("connection=" + cnx);
+//trace("connection=" + cnx);
 return java.db.Jdbc.create(cnx);
 } catch (e:Dynamic) {
 		trace(e);

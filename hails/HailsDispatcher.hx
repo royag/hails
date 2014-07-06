@@ -5,7 +5,7 @@
 
 package hails;
 
-import config.HailsConfig;
+import hails.config.HailsConfig;
 import hails.platform.IWebContext;
 import hails.util.StringUtil;
 import haxe.ds.StringMap;
@@ -15,7 +15,7 @@ import neko.Lib;
 
 // ControllerConfig should import all controllers, just to make them compile...
 // (Because if there are no references (as they are loaded dynamically) they're not compiled.
-import config.ControllerConfig;
+//import config.ControllerConfig;
 
 //
 class HailsDispatcher {

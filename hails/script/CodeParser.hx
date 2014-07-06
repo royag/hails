@@ -28,12 +28,12 @@ class CodeParser {
 	
 	public function pathToClass(cname:String) : String {
 		var classDir = rootDir;
-		trace(cname);
+		//trace(cname);
 		if (cname.indexOf("hails.") == 0) {
 			classDir = "C:/HaxeToolkit/haxe/lib/hails/0,0,2/";
 		}
 		var fn = classDir + StringTools.trim(StringTools.replace(cname, '.', '/')) + ".hx";
-		trace("path to class: " + fn);
+		//trace("path to class: " + fn);
 		return fn;
 	}
 	
