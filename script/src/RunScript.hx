@@ -4,6 +4,7 @@ import hails.config.DatabaseConfig;
 import hails.script.DbMigrator;
 import haxe.io.Path;
 import sys.io.File;
+import sys.io.Process;
 import sys.FileSystem;
 import hails.platform.Platform;
 
@@ -115,5 +116,141 @@ class RunScript {
 			//throw ("Error running: " + command + " " + args.join (" ") + " [" + path + "]");
 		}
 		return result;
+	}
+	
+    public static function recursiveCopy (source:String, destination:String, ignore:Array <String> = null) {
+		
+		if (ignore == null) {
+			
+			ignore = [];
+			
+		}
+		
+		mkdir (destination);
+		
+		var files = FileSystem.readDirectory (source);
+		
+		for (file in files) {
+			
+			var ignoreFile = false;
+			
+			for (ignoreName in ignore) {
+				
+				if (StringTools.endsWith (ignoreName, "/")) {
+					
+					if (FileSystem.isDirectory (source + "/" + file) && file == ignoreName.substr (0, file.length - 1)) {
+						
+						ignoreFile = true;
+						
+					}
+					
+				} else if (file == ignoreName || StringTools.endsWith (source + "/" + file, "/" + ignoreName)) {
+					
+					ignoreFile = true;
+					
+				}
+				
+			}
+			
+			if (!ignoreFile) {
+				
+				var itemDestination:String = destination + "/" + file;
+				var itemSource:String = source + "/" + file;
+				
+				if (FileSystem.isDirectory (itemSource)) {
+					
+					recursiveCopy (itemSource, itemDestination, ignore);
+					
+				} else {
+					
+					Sys.println ("Copying " + itemSource);
+					File.copy (itemSource, itemDestination);
+					
+				}
+				
+			}
+			
+		}
+		
+	}
+	
+	public static function mkdir (directory:String):Void {
+		
+		directory = StringTools.replace (directory, "\\", "/");
+		var total = "";
+		
+		if (directory.substr (0, 1) == "/") {
+			
+			total = "/";
+			
+		}
+		
+		var parts = directory.split("/");
+		var oldPath = "";
+		
+		if (parts.length > 0 && parts[0].indexOf (":") > -1) {
+			
+			oldPath = Sys.getCwd ();
+			Sys.setCwd (parts[0] + "\\");
+			parts.shift ();
+			
+		}
+		
+		for (part in parts) {
+			
+			if (part != "." && part != "") {
+				
+				if (total != "") {
+					
+					total += "/";
+					
+				}
+				
+				total += part;
+				
+				if (!FileSystem.exists (total)) {
+					
+					//print("mkdir " + total);
+					
+					FileSystem.createDirectory (total);
+					
+				}
+				
+			}
+			
+		}
+		
+		if (oldPath != "") {
+			
+			Sys.setCwd (oldPath);
+			
+		}
 	}	
+	
+	public static function removeDirectory (directory:String):Void {
+		
+		if (FileSystem.exists (directory) && FileSystem.isDirectory (directory)) {
+			
+			for (file in FileSystem.readDirectory (directory)) {
+				
+				var path = directory + "/" + file;
+				
+				if (FileSystem.isDirectory (path)) {
+					
+					removeDirectory (path);
+					
+				} else {
+					
+					FileSystem.deleteFile (path);
+					
+				}
+				
+			}
+			
+			FileSystem.deleteDirectory (directory);
+			
+		}
+		
+	}	
+		
 }
