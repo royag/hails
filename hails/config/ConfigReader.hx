@@ -29,6 +29,9 @@ class ConfigReader
 
 	public static function getConfig(configSet:String) : StringMap<String> {
 		var c = Resource.getString(configSet);
+		if (c == null) {
+			return getConfigFromFile("config/" + configSet);
+		}
 		var map = new StringMap<String>();
 		var lines:Array<String> = c.split("\n");
 		for (l in lines) {

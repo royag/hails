@@ -71,24 +71,30 @@ class RunScript {
 		
 		
 		if (args[0] == "migrate") {
-			DbMigrator.main();
-		} else if (args[0] == "jmigrate") {
-			#if java
-			DbMigrator.main();
-			#else
-			var mysqlJar = hailsDir + "jar/mysql-connector-java-5.1.31-bin.jar";
-			var sqlserverJar = hailsDir + "jar/sqljdbc4.jar";
-			var sqlJar = mysqlJar + ";" + sqlserverJar;
+			if (javaDbOnly(DatabaseConfig.getType())) {
+				#if java
+				DbMigrator.main();
+				#else
+				var mysqlJar = hailsDir + "jar/mysql-connector-java-5.1.31-bin.jar";
+				var sqlserverJar = hailsDir + "jar/sqljdbc4.jar";
+				var sqlJar = mysqlJar + ";" + sqlserverJar;
 
-			var args = ["-cp", hailsDir + "jrunner/DbMigrator.jar;config" + ";" + sqlJar, "hails.script.DbMigrator"];
-			//trace(args);
-			runCommand(null, "java", args);
-			#end
+				var args = ["-cp", hailsDir + "jrunner/DbMigrator.jar;config" + ";" + sqlJar, "hails.script.DbMigrator"];
+				//trace(args);
+				runCommand(null, "java", args);
+				#end
+			} else {
+				DbMigrator.main();
+			}
 		} else if (args[0] == "build") {
 			HailsBuilder.build(hailsDir, workDir, args);
 		} else if (args[0] == "create") {
 			HailsCreator.create(hailsDir, workDir, args);
 		}
+	}
+	
+	static function javaDbOnly(dbtype:String) {
+		return dbtype == "sqlserver";
 	}
 	
 	public static function runCommand (path:String, command:String, args:Array<String>, throwErrors:Bool = true):Int {
