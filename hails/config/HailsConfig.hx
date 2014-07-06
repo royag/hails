@@ -14,7 +14,21 @@ enum ApplicationControllers {
 class HailsConfig {
 	public static var URL_SEP = "/";
 	
-	public static var phpViewRoot = "/personal/google_code/hails/view";
+	public static function loadViewAsResource() {
+		#if java
+		return true;
+		#else
+		return false;
+		#end
+	}
+	
+	public static function getViewRoot() {
+		#if java
+		return "";
+		#else
+		return "/personal/google_code/hails/view";
+		#end
+	}
 	
 	public static function getLogFileName() : String {
 		return "C:/projects/hails_google/hails.log";

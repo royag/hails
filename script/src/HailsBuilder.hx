@@ -77,6 +77,7 @@ class WebApp extends Main
 		RunScript.recursiveCopy("war", "javaout/war");
 		
 		// TODO : Add views to WebApp.jar
+		RunScript.runCommand(workPath, javaHome + "/bin/jar.exe", ["uvf", "javaout/WebApp.jar", "view"]);
 		
 		File.copy ("javaout/WebApp.jar", "javaout/war/WEB-INF/lib/WebApp.jar");
 		if (dbtype != null) {

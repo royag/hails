@@ -11,6 +11,7 @@ import hails.util.StringUtil;
 import haxe.Template;
 import sys.io.File;
 import hails.platform.IWebContext;
+import haxe.Resource;
 
 class HailsBaseController {
 	var WebCtx:IWebContext;
@@ -72,14 +73,14 @@ class HailsBaseController {
 			throw /*new Exception(*/"No action to render";// );
 		}
 		if (action.indexOf("/") < 0) {
-			return HailsConfig.phpViewRoot + "/" + controllerId + "/" + action;
+			return HailsConfig.getViewRoot() + "/" + controllerId + "/" + action;
 		} else {
-			return HailsConfig.phpViewRoot + "/" + action;
+			return HailsConfig.getViewRoot() + "/" + action;
 		}
 	}
 	
 	private function resolveLayoutHtmlFile(layout:String) {
-		return HailsConfig.phpViewRoot + "/layout/" + layout + ".html";
+		return HailsConfig.getViewRoot() + "/layout/" + layout + ".html";
 	}
 	
 	private function resolvePhpViewName(action:String) {
@@ -112,7 +113,15 @@ class HailsBaseController {
 	}
 	
 	private function getHtml(fileName:String, ?vars:Dynamic, ?layout:String, ?callBacks:Dynamic) : String {
-		var content:String = File.getContent(fileName);
+		var content:String;
+		if (HailsConfig.loadViewAsResource()) {
+			fileName = "view" + fileName;
+			//trace("loading resource " + fileName);
+			content = Resource.getString(fileName);
+			//trace("=" + content);
+		} else {
+			content = File.getContent(fileName);
+		}
 		var t = new Template(content);
 		var contentHtml = t.execute(vars, callBacks);
 		if (layout != null) {
