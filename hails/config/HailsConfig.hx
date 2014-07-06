@@ -15,19 +15,20 @@ class HailsConfig {
 	public static var URL_SEP = "/";
 	
 	public static function loadViewAsResource() {
-		#if java
+		/*#if java
 		return true;
 		#else
 		return false;
-		#end
+		#end*/
+		return true;
 	}
 	
 	public static function getViewRoot() {
-		#if java
-		return "";
-		#else
-		return "/personal/google_code/hails/view";
-		#end
+		if (loadViewAsResource()) {
+			return "";
+		} else {
+			return "/personal/google_code/hails/view";
+		}
 	}
 	
 	public static function getLogFileName() : String {

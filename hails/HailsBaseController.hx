@@ -115,7 +115,12 @@ class HailsBaseController {
 	private function getHtml(fileName:String, ?vars:Dynamic, ?layout:String, ?callBacks:Dynamic) : String {
 		var content:String;
 		if (HailsConfig.loadViewAsResource()) {
+			//trace("so filename is : " + fileName);
 			fileName = "view" + fileName;
+			#if php
+			fileName += ".pl";
+			fileName = StringTools.replace(fileName, "/", "_");
+			#end
 			//trace("loading resource " + fileName);
 			content = Resource.getString(fileName);
 			//trace("=" + content);

@@ -126,7 +126,7 @@ class RunScript {
 		return result;
 	}
 	
-    public static function recursiveCopy (source:String, destination:String, ignore:Array <String> = null) {
+    public static function recursiveCopy (source:String, destination:String, ignore:Array <String> = null, addExtention:String = null, flatFrom:String=null) {
 		
 		if (ignore == null) {
 			
@@ -163,15 +163,25 @@ class RunScript {
 			if (!ignoreFile) {
 				
 				var itemDestination:String = destination + "/" + file;
+
+				
 				var itemSource:String = source + "/" + file;
 				
 				if (FileSystem.isDirectory (itemSource)) {
-					
-					recursiveCopy (itemSource, itemDestination, ignore);
+					recursiveCopy (itemSource, itemDestination, ignore, addExtention, flatFrom);
 					
 				} else {
 					
-					Sys.println ("Copying " + itemSource);
+					if (addExtention != null) {
+						itemDestination = itemDestination + addExtention;
+					}
+				if (flatFrom != null) {
+					itemDestination = itemDestination.substring(0, flatFrom.length) + 
+						StringTools.replace(itemDestination.substring(flatFrom.length), "/", "_");
+					//trace(destination);
+					//itemDestination = destination + "/" + StringTools.replace(file, "/", "_");
+				}					
+					Sys.println ("Copying " + itemSource + " to " + itemDestination);
 					File.copy (itemSource, itemDestination);
 					
 				}

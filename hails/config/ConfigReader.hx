@@ -28,7 +28,11 @@ class ConfigReader
 	}
 
 	public static function getConfig(configSet:String) : StringMap<String> {
-		var c = Resource.getString(configSet);
+		var configSetName = configSet;
+		#if php
+		configSetName = configSet + ".pl";
+		#end
+		var c = Resource.getString(configSetName);
 		if (c == null) {
 			return getConfigFromFile("config/" + configSet);
 		}

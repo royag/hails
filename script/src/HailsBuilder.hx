@@ -19,7 +19,7 @@ class HailsBuilder
 		if (target == "java") {
 			buildJava(hailsPath, workPath, args);
 		} else if (target == "php") {
-			
+			buildPhp(hailsPath, workPath, args);
 		}
 	}
 	
@@ -63,6 +63,19 @@ class WebApp extends Main
 }
 		 */
 	}
+	
+	public static function buildPhp(hailsPath:String, workPath:String, args:Array<String>) {
+		var haxeArgs = ["-php", "phpout", "-main", "controller.WebApp", "-cp", ".", "-lib", "hails"];
+		
+		haxeArgs.push("-resource");
+		haxeArgs.push("config/dbconfig@dbconfig.pl"); // !NB!: .pl(perl)-extension so it (usually) won't be able to load directly from webroot
+		
+		RunScript.removeDirectory("phpout/res");
+		RunScript.runCommand(workPath, "haxe", haxeArgs);
+		
+		RunScript.recursiveCopy("view", "phpout/res/view", null, ".pl", "phpout/res/"); // !NB!: .pl(perl)-extension so it (usually) won't be able to load directly from webroot
+	}
+	
 	
 	public static function buildJava(hailsPath:String, workPath:String, args:Array<String>) {
 		
