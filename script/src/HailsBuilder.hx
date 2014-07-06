@@ -76,7 +76,7 @@ class WebApp extends Main
 		RunScript.removeDirectory("javaout/war");
 		RunScript.recursiveCopy("war", "javaout/war");
 		
-		// TODO : Add views to WebApp.jar
+		Platform.println("Adding views to WebApp.jar...");
 		RunScript.runCommand(workPath, javaHome + "/bin/jar.exe", ["uvf", "javaout/WebApp.jar", "view"]);
 		
 		File.copy ("javaout/WebApp.jar", "javaout/war/WEB-INF/lib/WebApp.jar");
@@ -85,11 +85,21 @@ class WebApp extends Main
 			if (dbtype == "sqlserver") {
 				driver = "sqljdbc4.jar";
 			}
+			Platform.println("Adding SQL driver to WEB-INF/lib: " + driver);
 			File.copy (hailsPath + "jar/" + driver, "javaout/war/WEB-INF/lib/" + driver);
 		}
-		
-		RunScript.runCommand(workPath, javaHome + "/bin/jar.exe", ["cvf", "javaout/webapp.war", "-C", "javaout/war/", "."]);
-		
-	}	
+		var appName = appNameFromWorkPath(workPath);
+		var warFile = "javaout/"+appName+".war";
+		Platform.println("Assembling WAR-file: " + warFile);
+		RunScript.runCommand(workPath, javaHome + "/bin/jar.exe", ["cvf", warFile, "-C", "javaout/war/", "."]);
+	}
+	
+	static function appNameFromWorkPath(workPath:String) {
+		var slashI = workPath.lastIndexOf("/");
+		var backslashI = workPath.lastIndexOf("\\");
+		var lastSlash = (slashI > backslashI ? slashI : backslashI);
+		var appName = workPath.substring(lastSlash + 1);
+		return appName;
+	}
 	
 }
