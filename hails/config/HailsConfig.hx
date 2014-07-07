@@ -46,7 +46,7 @@ class HailsConfig {
 		return "/index.php/";
 		#end
 		#if java
-		return "/hailsdemo/Test/";
+		return "/hailsdemo/";
 		#else
 		return "/";
 		#end
@@ -60,7 +60,7 @@ class HailsConfig {
 		return 1;
 		#end
 		#if java
-		return 2;
+		return 1;
 		#else
 		return 0;
 		#end

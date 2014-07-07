@@ -144,6 +144,8 @@ class WebApp extends Main
 			var driver = "mysql-connector-java-5.1.31-bin.jar";
 			if (dbtype == "sqlserver") {
 				driver = "sqljdbc4.jar";
+			} else if (dbtype == "sqlite") {
+				driver = "sqlite-jdbc-3.7.2.jar";
 			}
 			Platform.println("Adding SQL driver to WEB-INF/lib: " + driver);
 			File.copy (hailsPath + "jar/" + driver, "javaout/war/WEB-INF/lib/" + driver);
@@ -152,6 +154,12 @@ class WebApp extends Main
 		var warFile = "javaout/"+appName+".war";
 		Platform.println("Assembling WAR-file: " + warFile);
 		RunScript.runCommand(workPath, javaHome + "/bin/jar.exe", ["cvf", warFile, "-C", "javaout/war/", "."]);
+		
+		if (args.length > 2 && args[2] == "run") {
+			var jettyJar = hailsPath + "/jar/jetty-runner.jar";
+			var javaArgs = ["-jar", jettyJar, warFile];
+			RunScript.runCommand(workPath, javaHome + "/bin/java.exe", javaArgs);
+		}
 	}
 	
 	public static function appNameFromWorkPath(workPath:String) {

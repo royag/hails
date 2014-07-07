@@ -17,6 +17,7 @@ import sys.db.ResultSet;
 #if java
 import javaext.db.Mysql;
 import javaext.db.SqlServer;
+import javaext.db.Sqlite;
 #end
 #if !java
 import sys.db.Mysql;
@@ -355,11 +356,9 @@ class HailsDbRecord extends hails.HailsBaseRecord {
 		} else if (connType == "mysql") {
 			connection = Mysql.connect(params);
 		} 
-		#if (php || neko)
 		else if (connType == "sqlite") {
 			connection = Sqlite.open(DatabaseConfig.getDatabase() + ".db");
 		}
-		#end
 		//trace(connection);
 		return connection;
 	}
