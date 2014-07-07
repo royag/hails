@@ -5,11 +5,11 @@
 
 package hails;
 
-import config.HailsConfig;
+import hails.config.HailsConfig;
 
 class HailsViewPhp extends HailsView {
 	public override function render() {
-		HailsPhpRenderer.includePhp(HailsConfig.phpViewRoot + "/" + 
+		HailsPhpRenderer.includePhp(HailsConfig.getViewRoot() + "/" + 
 			this.controllerId + "/" + this.actionId + ".php");
 	}
 }
