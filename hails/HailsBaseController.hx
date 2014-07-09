@@ -82,13 +82,8 @@ class HailsBaseController {
 	private function resolveLayoutHtmlFile(layout:String) {
 		return HailsConfig.getViewRoot() + "/layout/" + layout + ".html";
 	}
-	
-	private function resolvePhpViewName(action:String) {
-		return resolveViewName(action) + ".php";
-	}
 
 	private function resolveHtmlViewName(action:String) {
-		//Lib.print(resolveViewName(action) + ".html");
 		return resolveViewName(action) + ".html";
 	}
 	
@@ -106,10 +101,6 @@ class HailsBaseController {
 	function setAsRendered() {
 		this.hasRendered = true;
 		this.shouldRender = false;
-	}
-	
-	function doRender() {
-		trace("TRALALAL");
 	}
 	
 	private function getHtml(fileName:String, ?vars:Dynamic, ?layout:String, ?callBacks:Dynamic) : String {
