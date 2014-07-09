@@ -221,20 +221,4 @@ class HailsBaseController {
 		setAsRendered();
 		WebCtx.printBinary(outputData);
 	}
-	
-	#if php
-	/**
-	 * Include default php-view in action-methods, so that the calling method's local variables 
-	 * - as well as the controllers methods and instance method - are made available to the PHP-script.
-	 * E.g:	"var mystring = 'something'" in action-method will be available as "$mystring",
-	 * and the PHP-file will actually be a part of the controller class, 
-	 * so the controller-instance is actually available as "$this".
-	 * @param	?action		If specified, render an other action than the initial action called by dispatcher.
-	 */
-	inline function includePhp(?action:String) {
-		setAsRendered();
-		var render = doRender;
-		HailsPhpRenderer.includePhp(resolvePhpViewName(action));
-	}
-	#end
 }

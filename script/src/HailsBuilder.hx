@@ -22,6 +22,10 @@ class HailsBuilder
 			buildPhp(hailsPath, workPath, args);
 		} else if (target == "neko") {
 			buildNeko(hailsPath, workPath, args);
+		//} else if (target == "cpp") {
+		//	buildCpp(hailsPath, workPath, args);
+		} else {
+			Platform.println("Unrecognized target: " + target);
 		}
 	}
 	
@@ -50,21 +54,16 @@ class HailsBuilder
 			"}";
 		
 		File.saveContent("controller/WebApp.hx", webAppHx);
-		// go through controller-dir to find all controllers
-		// create "controller/WebApp.hx" :
-		/*
-		 * package controller;
-import hails.Main;
-import controller.MainController; .... etc....
-
-class WebApp extends Main
-{
-	static function main(){
-		hails.Main.main();
-	}	
-}
-		 */
 	}
+
+	/*public static function buildCpp(hailsPath:String, workPath:String, args:Array<String>) {
+		createWebAppHx(hailsPath, workPath);
+		RunScript.mkdir("cppout");
+		var haxeArgs = ["-cpp", "./cppout", "-main", "controller.WebApp", "-cp", ".", "-lib", "hails"];
+		haxeArgs.push("-resource");
+		haxeArgs.push("config/dbconfig@dbconfig"); // !NB!: .pl(perl)-extension so it (usually) won't be able to load directly from webroot
+		RunScript.runCommand(workPath, "haxe", haxeArgs);
+	}*/
 	
 	
 	public static function buildNeko(hailsPath:String, workPath:String, args:Array<String>) {
@@ -75,15 +74,12 @@ class WebApp extends Main
 		haxeArgs.push("-resource");
 		haxeArgs.push("config/dbconfig@dbconfig"); // !NB!: .pl(perl)-extension so it (usually) won't be able to load directly from webroot
 		
-		//RunScript.removeDirectory("phpout/res");
 		RunScript.runCommand(workPath, "haxe", haxeArgs);
 		
 		if (args.length > 2 && args[2] == "run") {
 			var nekoArgs = ["server", "-p", "2000", "-h", "localhost", "-d", "nekoout", "-rewrite"];
 			RunScript.runCommand(workPath, "nekotools", nekoArgs);
 		}
-		
-		//RunScript.recursiveCopy("view", "phpout/res/view", null, ".pl", "phpout/res/"); // !NB!: .pl(perl)-extension so it (usually) won't be able to load directly from webroot
 	}
 	
 	public static function buildPhp(hailsPath:String, workPath:String, args:Array<String>) {

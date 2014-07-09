@@ -6,7 +6,7 @@
 package hails;
 
 import hails.config.DatabaseConfig;
-#if (neko || php)
+#if !java
 import sys.db.Sqlite;
 #end
 //import controller.UserController;

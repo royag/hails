@@ -15,7 +15,7 @@ class HailsConfig {
 	public static var URL_SEP = "/";
 	
 	public static function loadViewAsResource() {
-		#if neko
+		#if (neko||cpp)
 		return false;
 		#else
 		return true;
@@ -26,7 +26,11 @@ class HailsConfig {
 		if (loadViewAsResource()) {
 			return "";
 		} else {
+			#if cpp
+			return "/personal/hails2/hailsdemo/view";
+			#else
 			return "view";
+			#end
 		}
 	}
 	
@@ -58,9 +62,10 @@ class HailsConfig {
 	public static function getUriScriptnameNo() : Int {
 		#if php
 		return 1;
-		#end
-		#if java
+		#elseif java
 		return 1;
+		#elseif cpp
+		return 2;
 		#else
 		return 0;
 		#end

@@ -288,11 +288,6 @@ class HailsDispatcher {
 	}
 	
 	function doRender(hc:HailsController, ctx:IWebContext) {
-		#if php
-		if (hc.renderType == "php") {
-			new HailsViewPhp(hc, getControllerUri(ctx), getActionName(ctx)).render();
-		} else 
-		#end
 		if (hc.renderType == "html") {
 			hc.render();
 		} else {
