@@ -80,6 +80,19 @@ class PhpWebContext implements IWebContext
 	public function getURI() : String {
 		return Web.getURI();
 	}
+	public function getRelativeURI() : String {
+		var u = getURI();
+		#if php
+		var basepath = "/index.php";
+		if (u.indexOf(basepath) == 0) {
+			return u.substring(basepath.length);
+		} else {
+			return u;
+		}
+		#else
+		return u;
+		#end
+	}
 	public function parseMultipart( onPart : String -> String -> Void, onData : Bytes -> Int -> Int -> Void ) : Void {
 		Web.parseMultipart(onPart, onData);
 	}

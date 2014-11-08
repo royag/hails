@@ -23,6 +23,7 @@ interface IWebContext
 	public function print(s:String) : Void;
 	public function println(s:String) : Void;
 	public function getURI() : String;
+	public function getRelativeURI() : String;
 	public function parseMultipart( onPart : String -> String -> Void, onData : Bytes -> Int -> Int -> Void ) : Void;
 	public function setSession(key:String, value:Dynamic) : Void;
 	public function getSession(key:String) : Dynamic;

@@ -93,6 +93,8 @@ class RunScript {
 			}
 		} else if (args[0] == "build") {
 			HailsBuilder.build(hailsDir, workDir, args);
+		} else if (args[0] == "test") {
+			HailsBuilder.build(hailsDir, workDir, args, true);
 		} else if (args[0] == "run") {
 			// alias for "build neko run"
 			HailsBuilder.build(hailsDir, workDir, ["build", "neko", "run"]);
@@ -143,8 +145,12 @@ class RunScript {
 		Platform.println("    hails livetest neko     - 'livetest' neko target");
 		Platform.println("    hails livetest java     - 'livetest' java target");
 		Platform.println("    hails livetest php      - 'livetest' php target");
-		Platform.println("        NB: Requires that you've set up Apache with");
+		Platform.println("        NB: Requires that you've set up Apache on port 80 with");
 		Platform.println("        webroot pointing at the phpout directory.");
+		Platform.println("    hails test              - build and unit test all supported targets");
+		Platform.println("    hails test neko         - unit tes neko target");
+		Platform.println("    hails test java         - unit tes java target");
+		Platform.println("    hails test php          - unit tes php target");
 		Platform.println("    hails migrate           - adjust database accoring to models.");
 		Platform.println("        WARNING: Possibly destructive operation!");
 		Platform.println("    hails create <name>     - create a basic project at specified location.");
@@ -181,7 +187,7 @@ class RunScript {
 			Sys.exit (1);
 			//throw ("Error running: " + command + " " + args.join (" ") + " [" + path + "]");
 		}
-		Platform.println("done");
+		//Platform.println("done");
 		return result;
 	}
 	

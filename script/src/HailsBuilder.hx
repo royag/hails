@@ -14,40 +14,60 @@ import sys.FileSystem;
 class HailsBuilder
 {
 
-	public static function build(hailsPath:String, workPath:String, args:Array<String>) {
-		var target = args[1];
-		if (target == "java") {
-			buildJava(hailsPath, workPath, args);
-		} else if (target == "php") {
-			buildPhp(hailsPath, workPath, args);
-		} else if (target == "neko") {
-			buildNeko(hailsPath, workPath, args);
-		//} else if (target == "cpp") {
-		//	buildCpp(hailsPath, workPath, args);
+	public static function build(hailsPath:String, workPath:String, args:Array<String>, unitTest:Bool = false) {
+		if (unitTest && args.length == 1) {
+			buildJava(hailsPath, workPath, args, unitTest);
+			buildNeko(hailsPath, workPath, args, unitTest);
+			buildPhp(hailsPath, workPath, args,unitTest);
 		} else {
-			Platform.println("Unrecognized target: " + target);
+			var target = args[1];
+			if (target == "java") {
+				buildJava(hailsPath, workPath, args,unitTest);
+			} else if (target == "php") {
+				buildPhp(hailsPath, workPath, args,unitTest);
+			} else if (target == "neko") {
+				buildNeko(hailsPath, workPath, args,unitTest);
+			//} else if (target == "cpp") {
+			//	buildCpp(hailsPath, workPath, args);
+			} else {
+				Platform.println("Unrecognized target: " + target);
+			}
 		}
 	}
 	
 	public static function createWebAppHx(hailsPath:String, workPath:String) {
 		
 		var webAppHx = "package controller;\n" +
-			"import hails.Main;\n";
+			"import hails.Main;\n" +
+			"import hails.HailsDispatcher;\n";
 
 		var directory = "controller";
+		var controllers:Array<String> = new Array<String>();
 		if (FileSystem.exists (directory) && FileSystem.isDirectory (directory)) {
 			for (file in FileSystem.readDirectory (directory)) {
 				var i = file.indexOf(".hx");
 				if (i > 0) {
 					var className = file.substring(0, i);
 					webAppHx += "import controller." + className + ";\n";
+					controllers.push(className);
 				}
 			}
 		}
 		
+		var controllerLoading = "\tstatic var tmp = new ControllerLoader([";
+		var first = true;
+		for (className in controllers) {
+			if (className != "WebApp") {
+				controllerLoading += (first ? "" : ",") + className;
+				first = false;
+			}
+		}
+		controllerLoading += "]);";
+		
 		webAppHx +=
 			"class WebApp extends Main\n" +
-			"{\n"+
+			"{\n\n" +
+			controllerLoading + "\n\n" +
 			"	static function main(){\n"+
 			"		hails.Main.main();\n"+
 			"	}	\n"+
@@ -66,42 +86,71 @@ class HailsBuilder
 	}*/
 	
 	
-	public static function buildNeko(hailsPath:String, workPath:String, args:Array<String>) {
+	public static function buildNeko(hailsPath:String, workPath:String, args:Array<String>, unitTest:Bool=false) {
 		createWebAppHx(hailsPath, workPath);
 		RunScript.mkdir("nekoout");
-		var haxeArgs = ["-neko", "./nekoout/index.n", "-main", "controller.WebApp", "-cp", ".", "-lib", "hails"];
+		var dest = "./nekoout/index.n";
+		var main = "controller.WebApp";
+		if (unitTest) {
+			dest = "./nekoout/unittest.n";
+			main = "test.unit.TestSuite";
+		}
+		var haxeArgs = ["-neko", dest, "-main", main, "-cp", ".", "-lib", "hails"];
 		
 		haxeArgs.push("-resource");
 		haxeArgs.push("config/dbconfig@dbconfig"); // !NB!: .pl(perl)-extension so it (usually) won't be able to load directly from webroot
 		
 		RunScript.runCommand(workPath, "haxe", haxeArgs);
 		
-		var nekoArgs = ["server", "-p", "2000", "-h", "localhost", "-d", "nekoout", "-rewrite"];
-		if (args.length > 2 && args[2] == "run") {
-			RunScript.runCommand(workPath, "nekotools", nekoArgs);
-		} else if (args.length > 2 && args[2] == "livetest") {
-			HailsLiveTester.runThenTest(workPath, "nekotools", nekoArgs, "http://localhost:2000/");
+		if (unitTest) {
+			Platform.println("[[[[ Unit Testing NEKO target ]]]]");
+			RunScript.runCommand(workPath, "neko", [dest]);
+		} else {
+			var nekoArgs = ["server", "-p", "2000", "-h", "localhost", "-d", "nekoout", "-rewrite"];
+			if (args.length > 2 && args[2] == "run") {
+				RunScript.runCommand(workPath, "nekotools", nekoArgs);
+			} else if (args.length > 2 && args[2] == "livetest") {
+				HailsLiveTester.runThenTest(workPath, "nekotools", nekoArgs, "http://localhost:2000/");
+			}
 		}
 	}
 	
-	public static function buildPhp(hailsPath:String, workPath:String, args:Array<String>) {
+	public static function buildPhp(hailsPath:String, workPath:String, args:Array<String>, unitTest:Bool=false) {
 		createWebAppHx(hailsPath, workPath);
-		var haxeArgs = ["-php", "phpout", "-main", "controller.WebApp", "-cp", ".", "-lib", "hails"];
+		var dest = "phpout";
+		var main = "controller.WebApp";
+		if (unitTest) {
+			dest = "phptest";
+			main = "test.unit.TestSuite";
+		}		
+		var haxeArgs = ["-php", dest, "-main", main, "-cp", ".", "-lib", "hails"];
 		
 		haxeArgs.push("-resource");
 		haxeArgs.push("config/dbconfig@dbconfig.pl"); // !NB!: .pl(perl)-extension so it (usually) won't be able to load directly from webroot
 		
-		RunScript.removeDirectory("phpout/res");
+		RunScript.removeDirectory(dest + "/res");
 		RunScript.runCommand(workPath, "haxe", haxeArgs);
 		
-		RunScript.recursiveCopy("view", "phpout/res/view", null, ".pl", "phpout/res/"); // !NB!: .pl(perl)-extension so it (usually) won't be able to load directly from webroot
-		if (args.length > 2 && args[2] == "livetest") {
-			HailsLiveTester.justTest(workPath, "http://localhost/index.php/");
-		}		
+		RunScript.recursiveCopy("view", dest + "/res/view", null, ".pl", dest + "/res/"); // !NB!: .pl(perl)-extension so it (usually) won't be able to load directly from webroot
+		
+		if (unitTest) {
+			Platform.println("[[[[ Unit Testing PHP target ]]]]");
+			RunScript.runCommand(workPath, "php", [dest + "/index.php"]);
+		} else {
+			if (args.length > 2 && args[2] == "livetest") {
+				HailsLiveTester.justTest(workPath, "http://localhost/index.php/");
+			}		
+		}
 	}
 	
 	
-	public static function buildJava(hailsPath:String, workPath:String, args:Array<String>) {
+	public static function buildJava(hailsPath:String, workPath:String, args:Array<String>, unitTest:Bool=false) {
+		
+		var dest = "javaout";
+		var main = "controller.WebApp";
+		if (unitTest) {
+			main = "test.unit.TestSuite";
+		}
 		
 		var dbconfig = ConfigReader.getConfigFromFile("config/dbconfig");
 		var dbtype = null;
@@ -116,7 +165,7 @@ class HailsBuilder
 		
 		createWebAppHx(hailsPath, workPath);
 		
-		var haxeArgs = ["-java", "javaout", "-main", "controller.WebApp", "-cp", ".", "-lib", "hails"];
+		var haxeArgs = ["-java", dest, "-main", main, "-cp", ".", "-lib", "hails"];
 		//var bscript = "-java javaout -main hails.Main -cp . ";
 		//bscript += " -java-lib " + hailsPath + "jar/servlet-api.jar ";
 		haxeArgs.push("-java-lib");
@@ -126,6 +175,12 @@ class HailsBuilder
 		haxeArgs.push("config/dbconfig@dbconfig");
 		
 		RunScript.runCommand(workPath, "haxe", haxeArgs);
+		
+		if (unitTest) {
+			Platform.println("[[[[ Unit Testing JAVA target ]]]]");
+			RunScript.runCommand(workPath, "java", ["-jar",dest+"/TestSuite.jar"]);
+			return;
+		}
 		
 		var directory = "war";
 		if (FileSystem.exists (directory) && FileSystem.isDirectory (directory)) {

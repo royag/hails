@@ -133,6 +133,16 @@ class JavaWebContext implements IWebContext
 	public function getURI() : String {
 		return request.getRequestURI();
 	}
+	
+	public function getRelativeURI() : String {
+		var sp = request.getServletPath();
+		var uri = getURI();
+		if (uri.indexOf(sp) == 0) {
+			return uri.substring(sp.length);
+		}
+		return uri; // couldnt determine
+	}
+	
 	public function parseMultipart( onPart : String -> String -> Void, onData : Bytes -> Int -> Int -> Void ) : Void {
 		
 	}

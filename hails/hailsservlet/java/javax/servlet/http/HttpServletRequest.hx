@@ -18,6 +18,8 @@ extern class HttpServletRequest
 	
 	@:overload public function getRequestURI() : String;
 	
+	@:overload public function getServletPath() : String;
+	
 	/*@:overload*/ public function getParameterMap() : Dynamic; // java.util.Map < String, NativeArray<String> > ;
 	
 	@:overload public function getParameterValues(name:String) : java.NativeArray<String>;

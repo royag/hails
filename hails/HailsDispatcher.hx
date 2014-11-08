@@ -1,32 +1,33 @@
-﻿/**
-* ...
-* @author Default
-*/
+﻿package hails;
 
-package hails;
-
+import controller.MainController;
 import hails.config.HailsConfig;
 import hails.hailsservlet.IWebContext;
+import hails.platform.Platform;
 import hails.util.StringUtil;
 import haxe.ds.StringMap;
-#if neko
-import neko.Lib;
-#end
 
-// ControllerConfig should import all controllers, just to make them compile...
-// (Because if there are no references (as they are loaded dynamically) they're not compiled.
-//import config.ControllerConfig;
+/**
+ * The generated WebApp.hx will call this once to load all controllers
+ */
+class ControllerLoader {
+	static var loaded = false;
+	public function new(controllers:Array<Class<HailsController>>) {
+		if (!loaded) {
+			HailsDispatcher.controllers = controllers;
+			loaded = true;
+		} else {
+			throw "internal error: ControllerLoader should only be called once!";
+		}
+	}
+}
 
-//
 class HailsDispatcher {
-
+	public static var controllers = new Array<Class<HailsController>>();
+	
 	public function new() {
 		
 	}
-	
-	/*function log(s:String):Void {
-		//Lib.println(s);
-	}*/
 	
 	static var controllerClassPrefix:String = "controller.";
 	
@@ -155,6 +156,13 @@ class HailsDispatcher {
 		var h = new HailsDispatcher();
 		h.doHandleRequest(ctx);
 	}
+	
+	/*function doHandleRequest(ctx:IWebContext) : Void {
+		Platform.println(ctx.getRelativeURI());
+		Platform.println("-------1111111------------333333333333-------44444444---------------");
+		Platform.println("--------" + ctx.getURI());
+		trace("----------" + ctx.getURI());
+	}*/
 	
 	function doHandleRequest(ctx:IWebContext) : Void {
 		try {
