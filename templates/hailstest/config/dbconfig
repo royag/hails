@@ -1,6 +1,6 @@
 type: sqlite
 port: 
-dbname: mytest
+dbname: /HaxeToolkit/haxe/lib/hails/hailstest
 username: 
 password: 
 host: 

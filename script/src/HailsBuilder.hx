@@ -95,6 +95,9 @@ class HailsBuilder
 		RunScript.runCommand(workPath, "haxe", haxeArgs);
 		
 		RunScript.recursiveCopy("view", "phpout/res/view", null, ".pl", "phpout/res/"); // !NB!: .pl(perl)-extension so it (usually) won't be able to load directly from webroot
+		if (args.length > 2 && args[2] == "livetest") {
+			HailsLiveTester.justTest(workPath, "http://localhost/index.php/");
+		}		
 	}
 	
 	

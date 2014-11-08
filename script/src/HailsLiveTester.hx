@@ -40,6 +40,17 @@ class HailsLiveTester
 		return 0;
 	}
 	
+	public static function justTest(path:String, baseUrl:String) : Int {
+		Platform.println("building live-tests");
+		var ret = buildLiveTests(path);
+		if (ret != 0) {
+			Platform.println("Building tests failed.");
+		}
+		Platform.println("Running live-tests");
+		runLiveTests(path, baseUrl);
+		return 0;
+	}
+	
 	static function buildLiveTests(workPath:String) : Int {
 		var haxeArgs = ["-neko", "livetest.n", "-main", "test.integration.TestSuite", "-cp", ".", "-lib", "hails"];
 		return RunScript.runCommand(workPath, "haxe", haxeArgs);

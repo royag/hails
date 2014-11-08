@@ -101,14 +101,18 @@ class RunScript {
 		} else if (args[0] == "livetest") {
 			var testJava = false;
 			var testNeko = false;
+			var testPhp = false;
 			if (args.length == 1) {
 				testJava = true;
 				testNeko = true;
+				testPhp = true;
 			} else {
 				if (args[1] == "java") {
 					testJava = true;
 				} else if (args[1] == "neko") {
 					testNeko = true;
+				} else if (args[1] == "php") {
+					testPhp = true;
 				} else {
 					Platform.println("target currently not supported for livetest: " + args[1]);
 				}
@@ -120,6 +124,10 @@ class RunScript {
 			if (testNeko) {
 				Platform.println("[[[[ Testing NEKO target ]]]]");
 				runCommand(null, "hails", ["build", "neko", "livetest"]);
+			}
+			if (testPhp) {
+				Platform.println("[[[[ Testing PHP target ]]]]");
+				runCommand(null, "hails", ["build", "php", "livetest"]);
 			}
 		}
 	}
@@ -133,6 +141,8 @@ class RunScript {
 		Platform.println("hails livetest          - build and 'livetest' all supported targets");
 		Platform.println("hails livetest neko     - 'livetest' neko target");
 		Platform.println("hails livetest java     - 'livetest' java target");
+		Platform.println("hails livetest php      - 'livetest' php target");
+		Platform.println("  NB: Requires that you've set up Apache with webroot pointing at the phpout directory.");
 		
 	}
 	
