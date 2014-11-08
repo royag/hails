@@ -1,15 +1,15 @@
-package hails.platform;
+package hails.hailsservlet ;
 import java.io.PrintWriter;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import hails.hailsservlet.java.javax.servlet.http.HttpServletRequest;
+import hails.hailsservlet.java.javax.servlet.http.HttpServletResponse;
+import hails.hailsservlet.java.javax.servlet.http.HttpSession;
 import haxe.ds.StringMap;
 import haxe.io.Bytes;
 import java.util.Map;
 import java.util.Set;
 import java.Lib;
 import java.io.IOException;
-import javax.servlet.ServletOutputStream;
+import hails.hailsservlet.java.javax.servlet.ServletOutputStream;
 import java.io.PrintWriter;
 import java.NativeArray;
 import hails.HailsDbRecord;
@@ -91,6 +91,9 @@ class JavaWebContext implements IWebContext
 	public function setHeader(key:String, value:String) : Void {
 		response.setHeader(key, value);
 	}
+	public function addHeader(key:String, value:String) : Void {
+		response.addHeader(key, value);
+	}	
 	public function flush() : Void {
 		//try {
 		if (_outStream != null) {

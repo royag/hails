@@ -10,7 +10,7 @@ import hails.html.ViewTool;
 import hails.util.StringUtil;
 import haxe.Template;
 import sys.io.File;
-import hails.platform.IWebContext;
+import hails.hailsservlet.IWebContext;
 import haxe.Resource;
 
 class HailsBaseController {

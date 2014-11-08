@@ -126,6 +126,7 @@ class RunScript {
 			Sys.exit (1);
 			//throw ("Error running: " + command + " " + args.join (" ") + " [" + path + "]");
 		}
+		trace("done");
 		return result;
 	}
 	

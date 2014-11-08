@@ -5,7 +5,7 @@
 
 package hails;
 import hails.html.ViewTool;
-import hails.platform.IWebContext;
+import hails.hailsservlet.IWebContext;
 import haxe.ds.StringMap;
 import haxe.io.Bytes;
 import hails.HailsDbRecord;

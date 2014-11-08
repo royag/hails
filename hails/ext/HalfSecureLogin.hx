@@ -10,7 +10,7 @@ package hails.ext;
 import hails.html.ViewTool;
 //import hails.util.ServerCrossPlatform;
 import hails.util.DynamicUtil;
-import hails.platform.IWebContext;
+import hails.hailsservlet.IWebContext;
 #end
 import haxe.crypto.Md5;
 

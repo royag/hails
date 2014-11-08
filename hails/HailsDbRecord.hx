@@ -15,9 +15,9 @@ import sys.db.Connection;
 import sys.db.Object;
 import sys.db.ResultSet;
 #if java
-import javaext.db.Mysql;
-import javaext.db.SqlServer;
-import javaext.db.Sqlite;
+import hails.hailsdb.java.drivers.Mysql;
+import hails.hailsdb.java.drivers.SqlServer;
+import hails.hailsdb.java.drivers.Sqlite;
 #end
 #if !java
 import sys.db.Mysql;

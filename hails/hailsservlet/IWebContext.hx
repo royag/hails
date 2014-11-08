@@ -1,4 +1,4 @@
-package hails.platform;
+package hails.hailsservlet ;
 import haxe.ds.StringMap;
 import haxe.io.Bytes;
 import hails.HailsDbRecord;
@@ -15,6 +15,7 @@ interface IWebContext
 	public function getMethod() : String;
 	public function setReturnCode(code:Int) : Void;
 	public function setHeader(key:String, value:String) : Void;
+	public function addHeader(key:String, value:String) : Void;
 	public function setContentType(ct:String) : Void;
 	public function isContentTypeSet() : Bool;
 	public function flush() : Void;

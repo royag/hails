@@ -76,9 +76,11 @@ class HailsBuilder
 		
 		RunScript.runCommand(workPath, "haxe", haxeArgs);
 		
+		var nekoArgs = ["server", "-p", "2000", "-h", "localhost", "-d", "nekoout", "-rewrite"];
 		if (args.length > 2 && args[2] == "run") {
-			var nekoArgs = ["server", "-p", "2000", "-h", "localhost", "-d", "nekoout", "-rewrite"];
 			RunScript.runCommand(workPath, "nekotools", nekoArgs);
+		} else if (args.length > 2 && args[2] == "livetest") {
+			HailsLiveTester.runThenTest(workPath, "nekotools", nekoArgs, "http://localhost:2000/");
 		}
 	}
 	
@@ -151,10 +153,12 @@ class HailsBuilder
 		Platform.println("Assembling WAR-file: " + warFile);
 		RunScript.runCommand(workPath, javaHome + "/bin/jar.exe", ["cvf", warFile, "-C", "javaout/war/", "."]);
 		
+		var jettyJar = hailsPath + "/jar/jetty-runner.jar";
+		var javaArgs = ["-jar", jettyJar, warFile];
 		if (args.length > 2 && args[2] == "run") {
-			var jettyJar = hailsPath + "/jar/jetty-runner.jar";
-			var javaArgs = ["-jar", jettyJar, warFile];
 			RunScript.runCommand(workPath, javaHome + "/bin/java.exe", javaArgs);
+		} else if (args.length > 2 && args[2] == "livetest") {
+			HailsLiveTester.runThenTest(workPath, javaHome + "/bin/java.exe", javaArgs, "http://localhost:8080/"+appName+"/"); // TODO: fix context path
 		}
 	}
 	

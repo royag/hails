@@ -1,18 +1,18 @@
 ﻿package hails;
 
 import hails.HailsDispatcher;
-import hails.platform.IWebContext;
+import hails.hailsservlet.IWebContext;
 #if php
-import hails.platform.PhpWebContext;
+import hails.hailsservlet.PhpWebContext;
 #end
 #if neko
-import hails.platform.PhpWebContext;
+import hails.hailsservlet.PhpWebContext;
 #end
 #if java
-import hails.platform.HailsServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import hails.platform.JavaWebContext;
+import hails.hailsservlet.java.HailsServlet;
+import hails.hailsservlet.java.javax.servlet.http.HttpServletRequest;
+import hails.hailsservlet.java.javax.servlet.http.HttpServletResponse;
+import hails.hailsservlet.JavaWebContext;
 #end
 
 //import config.DatabaseConfig;

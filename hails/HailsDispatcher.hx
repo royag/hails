@@ -6,7 +6,7 @@
 package hails;
 
 import hails.config.HailsConfig;
-import hails.platform.IWebContext;
+import hails.hailsservlet.IWebContext;
 import hails.util.StringUtil;
 import haxe.ds.StringMap;
 #if neko
