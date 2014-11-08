@@ -148,9 +148,9 @@ class RunScript {
 		Platform.println("        NB: Requires that you've set up Apache on port 80 with");
 		Platform.println("        webroot pointing at the phpout directory.");
 		Platform.println("    hails test              - build and unit test all supported targets");
-		Platform.println("    hails test neko         - unit tes neko target");
-		Platform.println("    hails test java         - unit tes java target");
-		Platform.println("    hails test php          - unit tes php target");
+		Platform.println("    hails test neko         - unit test neko target");
+		Platform.println("    hails test java         - unit test java target");
+		Platform.println("    hails test php          - unit test php target");
 		Platform.println("    hails migrate           - adjust database accoring to models.");
 		Platform.println("        WARNING: Possibly destructive operation!");
 		Platform.println("    hails create <name>     - create a basic project at specified location.");
