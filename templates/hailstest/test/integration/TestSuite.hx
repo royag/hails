@@ -1,28 +1,13 @@
 package test.integration;
 import haxe.unit.TestRunner;
+import hails.platform.Platform;
 
-/**
- * ...
- * @author Roy
- */
 class TestSuite
 {
-
-	public function new() 
-	{
-		
-	}
-	
-	public function runTests()  {
+	public static function main() {
         var r = new TestRunner();
-		
         r.add(new Test1());
 		r.run();
-		trace(r.result);
+		Platform.println(r.result.toString());
 	}
-	
-	public static function main() {
-		new TestSuite().runTests();
-	}
-	
 }

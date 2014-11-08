@@ -66,8 +66,13 @@ class RunScript {
 		}
 		var workDir = lastArgument;
 		Platform.println("HAILS 0.0.2");
-		Platform.println(lastArgument);
-		Platform.println(hailsDir);
+		//Platform.println(lastArgument);
+		//Platform.println(hailsDir);
+		Platform.println("");
+		if (args.length == 0) {
+			showHelp();
+			return;
+		}
 		
 		
 		if (args[0] == "migrate") {
@@ -93,7 +98,42 @@ class RunScript {
 			HailsBuilder.build(hailsDir, workDir, ["build", "neko", "run"]);
 		} else if (args[0] == "create") {
 			HailsCreator.create(hailsDir, workDir, args);
+		} else if (args[0] == "livetest") {
+			var testJava = false;
+			var testNeko = false;
+			if (args.length == 1) {
+				testJava = true;
+				testNeko = true;
+			} else {
+				if (args[1] == "java") {
+					testJava = true;
+				} else if (args[1] == "neko") {
+					testNeko = true;
+				} else {
+					Platform.println("target currently not supported for livetest: " + args[1]);
+				}
+			}
+			if (testJava) {
+				Platform.println("[[[[ Testing JAVA target ]]]]");
+				runCommand(null, "hails", ["build", "java", "livetest"]);
+			}
+			if (testNeko) {
+				Platform.println("[[[[ Testing NEKO target ]]]]");
+				runCommand(null, "hails", ["build", "neko", "livetest"]);
+			}
 		}
+	}
+	
+	static function showHelp() {
+		Platform.println("hails build java        - build java target");
+		Platform.println("hails build neko        - build neko target");
+		Platform.println("hails build php         - build php target");
+		Platform.println("hails build java run    - build and run java target");
+		Platform.println("hails build neko run    - build and run neko target");
+		Platform.println("hails livetest          - build and 'livetest' all supported targets");
+		Platform.println("hails livetest neko     - 'livetest' neko target");
+		Platform.println("hails livetest java     - 'livetest' java target");
+		
 	}
 	
 	static function javaDbOnly(dbtype:String) {
@@ -108,7 +148,7 @@ class RunScript {
 			try {
 				Sys.setCwd (path);
 			} catch (e:Dynamic) {
-				trace ("Cannot set current working directory to \"" + path + "\"");
+				Platform.println ("Cannot set current working directory to \"" + path + "\"");
 			}
 		}
 		
@@ -126,7 +166,7 @@ class RunScript {
 			Sys.exit (1);
 			//throw ("Error running: " + command + " " + args.join (" ") + " [" + path + "]");
 		}
-		trace("done");
+		Platform.println("done");
 		return result;
 	}
 	

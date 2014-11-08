@@ -34,7 +34,7 @@ class HailsLiveTester
 		Platform.println("Waiting a little for server to start...");
 		Sys.sleep(3);
 		Platform.println("Running live-tests");
-		runLiveTests(path);
+		runLiveTests(path, baseUrl);
 		Platform.println("Killing server...");
 		p.kill();
 		return 0;
@@ -44,8 +44,8 @@ class HailsLiveTester
 		var haxeArgs = ["-neko", "livetest.n", "-main", "test.integration.TestSuite", "-cp", ".", "-lib", "hails"];
 		return RunScript.runCommand(workPath, "haxe", haxeArgs);
 	}
-	static function runLiveTests(workPath:String) {
-		RunScript.runCommand(workPath, "neko", ["livetest.n"]);
+	static function runLiveTests(workPath:String, baseUrl:String) {
+		RunScript.runCommand(workPath, "neko", ["livetest.n", "baseurl="+baseUrl]);
 	}
 	
 }

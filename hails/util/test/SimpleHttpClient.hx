@@ -1,18 +1,15 @@
-package test.integration;
+package hails.util.test ;
 import haxe.ds.StringMap;
 import haxe.Http;
+import haxe.io.Bytes;
 import haxe.io.BytesOutput;
 
-/**
- * ...
- * @author Roy
- */
 class SimpleHttpClient
 {
 	var baseUrl:String;
 	var cookies:StringMap<String>;
 	public var http:Http;
-	public var output:BytesOutput;
+	public var output:Bytes;
 	public function new(baseUrl : String) 
 	{
 		this.baseUrl = baseUrl;
@@ -49,11 +46,26 @@ class SimpleHttpClient
 		}
 		prepareCookies(http);
 		http.onStatus = this.onStatus;
-		output = new BytesOutput();
-		http.customRequest(false, output, null, "GET");
+		var out = new BytesOutput();
+		http.customRequest(false, out, null, "GET");
+		output = out.getBytes();		
 		handleCookies(http.responseHeaders);
 	}
 	
+	public function doPost(path:String, postdata:String, preparer:Http -> Void = null) {
+		http = new Http(baseUrl + path);
+		if (preparer != null) {
+			preparer(http);
+		}
+		prepareCookies(http);
+		http.onStatus = this.onStatus;
+		http.setPostData(postdata);
+		var out = new BytesOutput();
+		http.customRequest(true, out, null, "POST");
+		output = out.getBytes();		
+		handleCookies(http.responseHeaders);
+	}	
+
 	public function doDelete(path:String, preparer:Http -> Void = null) {
 		http = new Http(baseUrl + path);
 		if (preparer != null) {
@@ -61,9 +73,23 @@ class SimpleHttpClient
 		}
 		prepareCookies(http);
 		http.onStatus = this.onStatus;
-		output = new BytesOutput();
-		http.customRequest(false, output, null, "DELETE");
+		var out = new BytesOutput();
+		http.customRequest(false, out, null, "DELETE");
+		output = out.getBytes();		
 		handleCookies(http.responseHeaders);
 	}	
+	
+	public function doPut(path:String, preparer:Http -> Void = null) {
+		http = new Http(baseUrl + path);
+		if (preparer != null) {
+			preparer(http);
+		}
+		prepareCookies(http);
+		http.onStatus = this.onStatus;
+		var out = new BytesOutput();
+		http.customRequest(false, out, null, "PUT");
+		output = out.getBytes();		
+		handleCookies(http.responseHeaders);
+	}		
 	
 }
