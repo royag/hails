@@ -157,6 +157,16 @@ class HailsDispatcher {
 		h.doHandleRequest(ctx);
 	}
 	
+	public static function getPathComponents(path:String) : Array<String> {
+		if (path == null) {
+			return null;
+		}
+		path = path.split("?")[0];
+		var comps = path.split("/");
+		while (comps.remove("")) {};
+		return comps;
+	}
+	
 	/*function doHandleRequest(ctx:IWebContext) : Void {
 		Platform.println(ctx.getRelativeURI());
 		Platform.println("-------1111111------------333333333333-------44444444---------------");
