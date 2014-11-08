@@ -1,4 +1,4 @@
-package test.integration;
+package test.unit;
 import haxe.unit.TestRunner;
 import hails.platform.Platform;
 

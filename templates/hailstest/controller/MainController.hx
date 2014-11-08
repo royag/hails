@@ -7,12 +7,16 @@ package controller;
 import hails.HailsController;
 import model.User;
 
+@path("main")
 class MainController extends HailsController
 {
 	public function index() {
 		viewData = { theMessage:"Hello world!" };
+		
 	}
 	
+	@action
+	@put
 	public function action_add() {
 		var u =  new User();
 		u.username = 'heisann';
