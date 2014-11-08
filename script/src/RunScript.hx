@@ -133,16 +133,20 @@ class RunScript {
 	}
 	
 	static function showHelp() {
-		Platform.println("hails build java        - build java target");
-		Platform.println("hails build neko        - build neko target");
-		Platform.println("hails build php         - build php target");
-		Platform.println("hails build java run    - build and run java target");
-		Platform.println("hails build neko run    - build and run neko target");
-		Platform.println("hails livetest          - build and 'livetest' all supported targets");
-		Platform.println("hails livetest neko     - 'livetest' neko target");
-		Platform.println("hails livetest java     - 'livetest' java target");
-		Platform.println("hails livetest php      - 'livetest' php target");
-		Platform.println("  NB: Requires that you've set up Apache with webroot pointing at the phpout directory.");
+		Platform.println("    hails build java        - build java target");
+		Platform.println("    hails build neko        - build neko target");
+		Platform.println("    hails build php         - build php target");
+		Platform.println("    hails build java run    - build and run java target");
+		Platform.println("    hails build neko run    - build and run neko target");
+		Platform.println("    hails livetest          - build and 'livetest' all supported targets");
+		Platform.println("    hails livetest neko     - 'livetest' neko target");
+		Platform.println("    hails livetest java     - 'livetest' java target");
+		Platform.println("    hails livetest php      - 'livetest' php target");
+		Platform.println("        NB: Requires that you've set up Apache with");
+		Platform.println("        webroot pointing at the phpout directory.");
+		Platform.println("    hails migrate           - adjust database accoring to models.");
+		Platform.println("        WARNING: Possibly destructive operation!");
+		Platform.println("    hails create <name>     - create a basic project at specified location.");
 		
 	}
 	
