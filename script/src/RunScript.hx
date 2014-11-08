@@ -138,6 +138,7 @@ class RunScript {
 		Platform.println("    hails build php         - build php target");
 		Platform.println("    hails build java run    - build and run java target");
 		Platform.println("    hails build neko run    - build and run neko target");
+		Platform.println("    hails run               - run using Neko Server");
 		Platform.println("    hails livetest          - build and 'livetest' all supported targets");
 		Platform.println("    hails livetest neko     - 'livetest' neko target");
 		Platform.println("    hails livetest java     - 'livetest' java target");

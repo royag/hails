@@ -37,6 +37,10 @@
   <!-- Paths to exclude from the Project Explorer tree -->
   <hiddenPaths>
     <hidden path="obj" />
+    <hidden path="*.sess" />
+    <hidden path="9acec0bc918800b462691e329de56a42.sess" />
+    <hidden path="647b5bf6f6b0f0f676a8770720772165.sess" />
+    <hidden path="8263feef8195962f805d5ee5135d5a43.sess" />
   </hiddenPaths>
   <!-- Executed before build -->
   <preBuildCommand>haxelib run hails build java</preBuildCommand>
