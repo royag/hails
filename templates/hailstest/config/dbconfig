@@ -1,0 +1,6 @@
+type: sqlite
+port: 
+dbname: mytest
+username: 
+password: 
+host: 
