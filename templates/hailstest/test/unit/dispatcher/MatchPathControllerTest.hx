@@ -17,6 +17,7 @@ class MainTestController extends HailsController {
 	@POST
 	public function store() {}
 }
+
 @path("/user/{userid?}")
 class UserTestController extends HailsController {
 	@GET
@@ -28,16 +29,19 @@ class UserTestController extends HailsController {
 	@DELETE
 	public function delete() {}
 }
+
 @path("car")
 class CarTestController extends HailsController {
 	@GET
 	public function index() {}
 }
+
 @path("road/{roadNo}")
 class RoadTestController extends HailsController {
 	@GET
 	public function index() {}
 }
+
 class PathLessTestController extends HailsController {
 	@GET
 	public function index() { }
@@ -50,12 +54,52 @@ class PathLessTestController extends HailsController {
 	public function postActionByAnnotation() {	}
 }
 
+@path("actOne/{$action}")
+class PathWithActionController extends HailsController {
+	@action
+	public function index() {}
+	@action
+	public function someTest() {}
+	@action("post_only")
+	@POST
+	public function onlyWorksWithPost() {}
+}
+
+@path("actTwo/{$action}/{param1?}/")
+class PathWithActionAndOptionalParamController extends HailsController {
+	@action
+	public function index() {}
+	@action
+	public function someTest() {}
+	@action("post_only")
+	@POST
+	public function onlyWorksWithPost() {}
+}
+
+
 class MatchPathControllerTest extends TestCase
 {
 	static var controllers:Array<Class<HailsController>> = 
 		[MainTestController, UserTestController, PathLessTestController, CarTestController,
-		RoadTestController];
+		RoadTestController, PathWithActionController,PathWithActionAndOptionalParamController];
 
+	public function testPathWithActionAndOptionalParamController() {
+		doTest("/actTwo/index", "GET", PathWithActionAndOptionalParamController, "index", strmap({"param1" : null}));
+		doTest("/actTwo/post_only", "GET", null,null,null);
+		doTest("/actTwo/post_only", "POST", PathWithActionAndOptionalParamController, "onlyWorksWithPost", strmap({"param1" : null}));
+		doTest("/actTwo/index/myvalue", "GET", PathWithActionAndOptionalParamController, "index", strmap({"param1" : "myvalue"}));
+		doTest("/actTwo/post_only/myvalue", "GET", null,null,null);
+		doTest("/actTwo/post_only/myvalue", "POST", PathWithActionAndOptionalParamController, "onlyWorksWithPost", strmap({"param1" : "myvalue"}));
+	}
+		
+		
+	public function testPathWithActionController() {
+		doTest("/actOne/index", "GET", PathWithActionController, "index", strmap({}));
+		doTest("/actOne/post_only", "GET", null,null,null);
+		doTest("/actOne/post_only", "POST", PathWithActionController, "onlyWorksWithPost", strmap({}));
+	}
+		
+		
 	public function testRootPath() {
 		doTest("/", "GET", MainTestController, "index", strmap({}));
 		doTest("/", "POST", MainTestController, "store", strmap({}));

@@ -30,7 +30,12 @@ class HailsControllerMethodFinder
 				if (meta.path.length == 1) {
 					var vars:StringMap<String> = matchPathAndReturnVariables(meta.path[0], path);
 					if (vars != null) {
-						var funcName = findProperFunction(c, null, ctx);
+						var mustBeAction:String = null;
+						if (vars.exists("$action")) {
+							mustBeAction = vars.get("$action");
+							vars.remove("$action");
+						}
+						var funcName = findProperFunction(c, mustBeAction, ctx);
 						if (funcName != null) {
 							ret.controller = c;
 							ret.controllerFunction = funcName;
