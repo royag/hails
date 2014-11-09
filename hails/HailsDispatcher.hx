@@ -60,12 +60,15 @@ class HailsDispatcher {
 						return c;
 					}
 				}
-			} else if (ALLOW_MISSING_CONTROLLER_PATH) {
+			}
+		}
+		if (ALLOW_MISSING_CONTROLLER_PATH) {
+			for (c in controllers) {
 				var comp = getPathComponents(path);
-				trace(comp);
-				if (comp.length == 1) {
+				if (comp.length >= 1) {
 					var className = Type.getClassName(c).split(".").pop();
 					if (className == StringUtil.camelize(comp[0]) + "Controller") {
+						//Type.get
 						return c;
 					}
 				}

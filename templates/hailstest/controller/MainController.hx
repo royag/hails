@@ -9,13 +9,14 @@ import model.User;
 
 class MainController extends HailsController
 {
+	@GET
 	public function index() {
 		viewData = { theMessage:"Hello world!" };
 		
 	}
 	
 	@action
-	@put
+	@PUT
 	public function action_add() {
 		var u =  new User();
 		u.username = 'heisann';
@@ -25,6 +26,7 @@ class MainController extends HailsController
 		}
 	}
 	
+	@action("some_test")
 	public function action_someTest() {
 		var s = "This is a test!";
 		var users = User.findAll();
