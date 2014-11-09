@@ -70,12 +70,13 @@ class HailsControllerMethodFinder
 	}
 	
 	static function functionMetaMatchesHttpMethod(funcMeta : Dynamic, method:String) : Bool {
+		var isExplicitAction = Reflect.hasField(funcMeta, "action");
 		method = method.toUpperCase();
 		var allowGET = Reflect.hasField(funcMeta, "GET");
 		var allowPOST = Reflect.hasField(funcMeta, "POST");
 		var allowDELETE = Reflect.hasField(funcMeta, "DELETE");
 		var allowPUT = Reflect.hasField(funcMeta, "PUT");
-		var allowAny = (!allowGET) && (!allowPOST) && (!allowDELETE) && (!allowPUT);
+		var allowAny = isExplicitAction && (!allowGET) && (!allowPOST) && (!allowDELETE) && (!allowPUT);
 		if (allowAny) {
 			return true;
 		}

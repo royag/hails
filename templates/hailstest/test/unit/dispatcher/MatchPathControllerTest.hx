@@ -76,13 +76,36 @@ class PathWithActionAndOptionalParamController extends HailsController {
 	public function onlyWorksWithPost() {}
 }
 
+class ActionAndPathLessController extends HailsController {
+	public function index() {}
+	@thisissomethingelse
+	public function index2() {}
+}
+
+@path("actionless")
+class ActionLessController extends HailsController {
+	public function index() {}
+	@thisissomethingelse
+	public function index2() {}
+}
 
 class MatchPathControllerTest extends TestCase
 {
 	static var controllers:Array<Class<HailsController>> = 
 		[MainTestController, UserTestController, PathLessTestController, CarTestController,
-		RoadTestController, PathWithActionController,PathWithActionAndOptionalParamController];
+		RoadTestController, PathWithActionController, PathWithActionAndOptionalParamController,
+		ActionAndPathLessController,ActionLessController];
 
+	public function testActionAndPathLessControllerShouldNotReturnAnything() {
+		doTest("/action_and_path_less/", "GET", null, null, null);
+		doTest("/action_and_path_less/index", "GET", null, null, null);
+	}
+	
+	public function testActionLessControllerShouldNotReturnAnything() {
+		doTest("/actionless/", "GET", null, null, null);
+		doTest("/actionless/index", "GET", null, null, null);
+	}	
+		
 	public function testPathWithActionAndOptionalParamController() {
 		doTest("/actTwo/index", "GET", PathWithActionAndOptionalParamController, "index", strmap({"param1" : null}));
 		doTest("/actTwo/post_only", "GET", null,null,null);
