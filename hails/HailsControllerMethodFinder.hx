@@ -1,5 +1,6 @@
 package hails;
 import hails.hailsservlet.IWebContext;
+import hails.platform.Platform;
 import hails.util.StringUtil;
 import haxe.ds.StringMap;
 import haxe.rtti.Meta;
@@ -23,6 +24,8 @@ class HailsControllerMethodFinder
 	
 	public static function findControllerMethodParams(controllers: Array<Class<HailsController>>, ctx : IWebContext) : ControllerMethodParams {
 		var path = ctx.getRelativeURI();
+		//Platform.println(path);
+		//Platform.println(Std.string(controllers));
 		var ret = new ControllerMethodParams();
 		for (c in controllers) {
 			var meta = Meta.getType(c);
@@ -44,21 +47,20 @@ class HailsControllerMethodFinder
 						}
 					}
 				}
-			}
-		}
-		if (ALLOW_MISSING_CONTROLLER_PATH) {
-			for (c in controllers) {
-				var comp = getPathComponents(path);
-				if (comp.length == 1 || comp.length == 2) {
-					var className = Type.getClassName(c).split(".").pop();
-					if (className == StringUtil.camelize(comp[0]) + "Controller") {
-						var mustBeAction:String = (comp.length == 2 ? comp[1] : null);
-						var funcName = findProperFunction(c, mustBeAction, ctx);
-						if (funcName != null) {
-							ret.controller = c;
-							ret.controllerFunction = funcName;
-							ret.variables = new StringMap<String>();
-							return ret;
+			} else {
+				if (ALLOW_MISSING_CONTROLLER_PATH) {
+					var comp = getPathComponents(path);
+					if (comp.length == 1 || comp.length == 2) {
+						var className = Type.getClassName(c).split(".").pop();
+						if (className == StringUtil.camelize(comp[0]) + "Controller") {
+							var mustBeAction:String = (comp.length == 2 ? comp[1] : null);
+							var funcName = findProperFunction(c, mustBeAction, ctx);
+							if (funcName != null) {
+								ret.controller = c;
+								ret.controllerFunction = funcName;
+								ret.variables = new StringMap<String>();
+								return ret;
+							}
 						}
 					}
 				}
@@ -149,8 +151,15 @@ class HailsControllerMethodFinder
 		return variables;
 	}
 	
-	static function getPathComponents(path:String, removeParams=true) : Array<String> {
-		return HailsDispatcher.getPathComponents(path,removeParams);
-	}	
-	
+	public static function getPathComponents(path:String, removeParams=true) : Array<String> {
+		if (path == null) {
+			return null;
+		}
+		if (removeParams) {
+			path = path.split("?")[0];
+		}
+		var comps = path.split("/");
+		while (comps.remove("")) {};
+		return comps;
+	}
 }

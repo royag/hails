@@ -216,7 +216,7 @@ class HailsBuilder
 		if (args.length > 2 && args[2] == "run") {
 			RunScript.runCommand(workPath, javaHome + "/bin/java.exe", javaArgs);
 		} else if (args.length > 2 && args[2] == "livetest") {
-			HailsLiveTester.runThenTest(workPath, javaHome + "/bin/java.exe", javaArgs, "http://localhost:8080/"+appName+"/");
+			HailsLiveTester.runThenTest(workPath, javaHome + "/bin/java.exe", javaArgs, "http://localhost:8080/"); // +appName+"/");
 		}
 	}
 	

@@ -1,4 +1,5 @@
 package hails.hailsservlet ;
+import hails.platform.Platform;
 import java.io.PrintWriter;
 import hails.hailsservlet.java.javax.servlet.http.HttpServletRequest;
 import hails.hailsservlet.java.javax.servlet.http.HttpServletResponse;
@@ -135,12 +136,16 @@ class JavaWebContext implements IWebContext
 	}
 	
 	public function getRelativeURI() : String {
-		var sp = request.getServletPath();
+		var sp = request.getContextPath();
+		//var serpath = request.getServletPath();
 		var uri = getURI();
+		
+		//return sp + "**" + serpath + "**" + uri;
+		
 		if (uri.indexOf(sp) == 0) {
 			return uri.substring(sp.length);
 		}
-		return uri; // couldnt determine
+		return uri;
 	}
 	
 	public function parseMultipart( onPart : String -> String -> Void, onData : Bytes -> Int -> Int -> Void ) : Void {

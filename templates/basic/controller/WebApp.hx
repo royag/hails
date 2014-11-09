@@ -6,7 +6,7 @@ import controller.WebApp;
 class WebApp extends Main
 {
 
-	static var tmp = new ControllerLoader([MainController]);
+	static var tmp = HailsDispatcher.initControllers([MainController]);
 
 	static function main(){
 		hails.Main.main();

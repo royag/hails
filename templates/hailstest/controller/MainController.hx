@@ -7,7 +7,6 @@ package controller;
 import hails.HailsController;
 import model.User;
 
-@path("/")
 class MainController extends HailsController
 {
 	@GET
@@ -17,8 +16,8 @@ class MainController extends HailsController
 	}
 	
 	@action
-	@PUT
-	public function action_add() {
+	@GET
+	public function add() {
 		var u =  new User();
 		u.username = 'heisann';
 		var a = u.save();
@@ -28,7 +27,7 @@ class MainController extends HailsController
 	}
 	
 	@action("some_test")
-	public function action_someTest() {
+	public function someTest() {
 		var s = "This is a test!";
 		var users = User.findAll();
 		for (u in users) {

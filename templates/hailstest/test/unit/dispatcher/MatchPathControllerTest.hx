@@ -102,6 +102,7 @@ class MatchPathControllerTest extends TestCase
 		
 	public function testRootPath() {
 		doTest("/", "GET", MainTestController, "index", strmap({}));
+		doTest("/main_test", "GET", null, null, null);
 		doTest("/", "POST", MainTestController, "store", strmap({}));
 	}
 	
@@ -150,8 +151,8 @@ class MatchPathControllerTest extends TestCase
 			return;
 		}
 		assertTrue(res != null);
-		assertEquals(res.controllerFunction, expFunc);
-		assertEquals(res.controller, expController);
+		assertEquals(expFunc, res.controllerFunction);
+		assertEquals(expController, res.controller);
 		assertEquals(expVars.toString(), res.variables.toString());
 	}
 	
