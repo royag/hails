@@ -7,6 +7,7 @@ package controller;
 import hails.HailsController;
 import model.User;
 
+@path("/")
 class MainController extends HailsController
 {
 	@GET

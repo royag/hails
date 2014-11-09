@@ -206,11 +206,13 @@ class HailsDispatcher {
 		h.doHandleRequest(ctx);
 	}
 	
-	public static function getPathComponents(path:String) : Array<String> {
+	public static function getPathComponents(path:String, removeParams=true) : Array<String> {
 		if (path == null) {
 			return null;
 		}
-		path = path.split("?")[0];
+		if (removeParams) {
+			path = path.split("?")[0];
+		}
 		var comps = path.split("/");
 		while (comps.remove("")) {};
 		return comps;

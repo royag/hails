@@ -13,7 +13,9 @@ class ControllerMethodParams {
 
 class HailsControllerMethodFinder
 {
-
+	
+	private static inline var ALLOW_MISSING_CONTROLLER_PATH = true;
+	
 	public function new() 
 	{
 		
@@ -50,7 +52,7 @@ class HailsControllerMethodFinder
 						if (funcName != null) {
 							ret.controller = c;
 							ret.controllerFunction = funcName;
-							ret.variables = null;
+							ret.variables = new StringMap<String>();
 							return ret;
 						}
 					}
@@ -92,7 +94,7 @@ class HailsControllerMethodFinder
 						if (StringUtil.camelizeWithFirstAsLower(mustBeAction) == funcName) {
 							isCandidate = true;
 						}
-					} else if (actionVal == mustBeAction) {
+					} else if (actionVal[0] == mustBeAction) {
 						isCandidate = true;
 					}
 				}
@@ -111,17 +113,29 @@ class HailsControllerMethodFinder
 	
 	static function matchPathAndReturnVariables(declared:String, actual:String) : StringMap<String> {
 		var variables = new StringMap<String>();
-		var decl = getPathComponents(declared);
+		var decl = getPathComponents(declared, false);
 		var act = getPathComponents(actual);
+		while (decl.length > act.length) {
+			act.push(null);
+		}
 		if (decl.length != act.length) {
 			return null;
-		}
+		}		
 		for (i in 0...decl.length) {
 			var d = decl[i];
 			var a = act[i];
 			if (!(d == a)) {
 				if (StringTools.startsWith(d, "{") && StringTools.endsWith(d, "}")) {
-					variables.set(d.substr(1, d.length - 2), a);
+					var varName = d.substr(1, d.length - 2);
+					var optional = false;
+					if (StringTools.endsWith(varName, "?")) {
+						optional = true;
+						varName = varName.substring(0, varName.length - 1);
+					}
+					if ((!optional) && (a == null)) {
+						return null;
+					}
+					variables.set(varName, a);
 				} else {
 					return null;
 				}
@@ -130,36 +144,8 @@ class HailsControllerMethodFinder
 		return variables;
 	}
 	
-	private static inline var ALLOW_MISSING_CONTROLLER_PATH = true;
-	/*public static function findControllerFromPath(controllers: Array<Class<HailsController>>, path:String) : Class<HailsController> {
-		for (c in controllers) {
-			var meta = Meta.getType(c);
-			if (meta.path != null) {
-				if (meta.path.length == 1) {
-					if (matchPath(meta.path[0], path)) {
-						return c;
-					}
-				}
-			}
-		}
-		if (ALLOW_MISSING_CONTROLLER_PATH) {
-			for (c in controllers) {
-				var comp = getPathComponents(path);
-				if (comp.length >= 1) {
-					var className = Type.getClassName(c).split(".").pop();
-					if (className == StringUtil.camelize(comp[0]) + "Controller") {
-						//Type.get
-						return c;
-					}
-				}
-			}
-		}
-		return null;
-	}*/
-	
-	
-	static function getPathComponents(path:String) : Array<String> {
-		return HailsDispatcher.getPathComponents(path);
+	static function getPathComponents(path:String, removeParams=true) : Array<String> {
+		return HailsDispatcher.getPathComponents(path,removeParams);
 	}	
 	
 }
