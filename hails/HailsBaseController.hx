@@ -25,19 +25,6 @@ class HailsBaseController {
 		this.defaultLayout = null; // "main";
 		this.viewData = { };
 	}
-
-	public function route(r:Route) : String {
-		switch (r) {
-			case get : return 'index';
-			case get_param(param) : return 'show';
-			case get_param2(p1,p2) : return null;
-			case post : return 'create';
-			case post_param(param) : return 'update';
-			case post_param2(p1,p2) : return null;
-			case delete_param(param) : return 'delete';
-			case delete_param2(p1,p2) : return null;
-		}
-	}	
 	
 	public var errorMessage:String;
 	public var infoMessage:String;
