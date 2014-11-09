@@ -7,7 +7,6 @@ package controller;
 import hails.HailsController;
 import model.User;
 
-@path("main")
 class MainController extends HailsController
 {
 	public function index() {

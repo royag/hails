@@ -54,7 +54,7 @@ class HailsBuilder
 			}
 		}
 		
-		var controllerLoading = "\tstatic var tmp = new ControllerLoader([";
+		var controllerLoading = "\tstatic var tmp = HailsDispatcher.initControllers([";
 		var first = true;
 		for (className in controllers) {
 			if (className != "WebApp") {

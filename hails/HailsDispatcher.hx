@@ -1,33 +1,79 @@
 ﻿package hails;
 
-import controller.MainController;
+//import controller.MainController;
 import hails.config.HailsConfig;
 import hails.hailsservlet.IWebContext;
 import hails.platform.Platform;
 import hails.util.StringUtil;
 import haxe.ds.StringMap;
+import haxe.rtti.Meta;
 
-/**
- * The generated WebApp.hx will call this once to load all controllers
- */
-class ControllerLoader {
-	static var loaded = false;
-	public function new(controllers:Array<Class<HailsController>>) {
-		if (!loaded) {
-			HailsDispatcher.controllers = controllers;
-			loaded = true;
-		} else {
-			throw "internal error: ControllerLoader should only be called once!";
-		}
-	}
-}
+
+
 
 class HailsDispatcher {
-	public static var controllers = new Array<Class<HailsController>>();
 	
 	public function new() {
 		
 	}
+	
+	private static var controllers:Array<Class<HailsController>> = null;
+	
+	/**
+	* The generated WebApp.hx will call this once to load all controllers
+	*/
+	public static function initControllers(theControllers : Array<Class<HailsController>>) : Bool {
+		if (controllers != null) {
+			return false;
+		}
+		controllers = theControllers.copy();
+		return true;	
+	}
+	public static function _getControllerArrayCopy() {
+		if (controllers != null) {
+			return controllers.copy();
+		}
+		return null;
+	}
+	
+	static function matchPath(declared:String, actual:String) {
+		var decl = getPathComponents(declared);
+		var act = getPathComponents(actual);
+		if (decl.length != act.length) {
+			return false;
+		}
+		for (i in 0...decl.length) {
+			if (!(decl[i] == act[i])) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	private static inline var ALLOW_MISSING_CONTROLLER_PATH = true;
+	public static function findControllerFromPath(path:String) : Class<HailsController> {
+		for (c in controllers) {
+			var meta = Meta.getType(c);
+			if (meta.path != null) {
+				if (meta.path.length == 1) {
+					if (matchPath(meta.path[0], path)) {
+						return c;
+					}
+				}
+			} else if (ALLOW_MISSING_CONTROLLER_PATH) {
+				var comp = getPathComponents(path);
+				trace(comp);
+				if (comp.length == 1) {
+					var className = Type.getClassName(c).split(".").pop();
+					if (className == StringUtil.camelize(comp[0]) + "Controller") {
+						return c;
+					}
+				}
+			}
+		}
+		return null;
+	}
+
 	
 	static var controllerClassPrefix:String = "controller.";
 	
