@@ -1,6 +1,6 @@
 {
 	"name": "hails",
-	"url": "http://github.com/openfl/lime",
+	"url": "https://code.google.com/p/hails/",
 	"license": "MIT",
 	"tags": [],
 	"description": "A lightweight web framework for Haxe with PHP or Java",
