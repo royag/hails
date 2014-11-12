@@ -2,6 +2,7 @@ package ;
 
 import hails.config.ConfigReader;
 import hails.platform.Platform;
+import haxe.ds.StringMap;
 import haxe.io.Path;
 import sys.io.File;
 import sys.io.Process;
@@ -95,10 +96,10 @@ class HailsBuilder
 			dest = "./nekoout/unittest.n";
 			main = "test.unit.TestSuite";
 		}
-		var haxeArgs = ["-neko", dest, "-main", main, "-cp", ".", "-lib", "hails"];
+		var haxeArgs = ["-neko", dest, "-main", main, "-cp", ".", "-lib", "hails"].concat(getHaxeLibArgs());
 		
 		haxeArgs.push("-resource");
-		haxeArgs.push("config/dbconfig@dbconfig"); // !NB!: .pl(perl)-extension so it (usually) won't be able to load directly from webroot
+		haxeArgs.push("config/dbconfig@dbconfig");
 		
 		RunScript.runCommand(workPath, "haxe", haxeArgs);
 		
@@ -123,7 +124,7 @@ class HailsBuilder
 			dest = "phptest";
 			main = "test.unit.TestSuite";
 		}		
-		var haxeArgs = ["-php", dest, "-main", main, "-cp", ".", "-lib", "hails"];
+		var haxeArgs = ["-php", dest, "-main", main, "-cp", ".", "-lib", "hails"].concat(getHaxeLibArgs());
 		
 		haxeArgs.push("-resource");
 		haxeArgs.push("config/dbconfig@dbconfig.pl"); // !NB!: .pl(perl)-extension so it (usually) won't be able to load directly from webroot
@@ -143,6 +144,32 @@ class HailsBuilder
 		}
 	}
 	
+	private static var _haxeConfig : StringMap<String> = null;
+	public static function getHaxeConfig() {
+		if (_haxeConfig == null) {
+			_haxeConfig = ConfigReader.getConfigFromFile("config/haxeconfig");
+		}
+		return _haxeConfig;
+	}
+	public static function getNeededLibs() : Array<String> {
+		var conf = getHaxeConfig();
+		if (conf == null) {
+			return new Array<String>();
+		}
+		var libList = conf.get("libs");
+		if ((libList == null) || (libList.length == 0)) {
+			return new Array<String>();
+		}
+		return libList.split(",");
+	}
+	public static function getHaxeLibArgs() {
+		var ret = new Array<String>();
+		for (lib in getNeededLibs()) {
+			ret.push("-lib");
+			ret.push(lib);
+		}
+		return ret;
+	}
 	
 	public static function buildJava(hailsPath:String, workPath:String, args:Array<String>, unitTest:Bool=false) {
 		
@@ -165,7 +192,7 @@ class HailsBuilder
 		
 		createWebAppHx(hailsPath, workPath);
 		
-		var haxeArgs = ["-java", dest, "-main", main, "-cp", ".", "-lib", "hails"];
+		var haxeArgs = ["-java", dest, "-main", main, "-cp", ".", "-lib", "hails"].concat(getHaxeLibArgs());
 		//var bscript = "-java javaout -main hails.Main -cp . ";
 		//bscript += " -java-lib " + hailsPath + "jar/servlet-api.jar ";
 		haxeArgs.push("-java-lib");
@@ -174,6 +201,7 @@ class HailsBuilder
 		haxeArgs.push("-resource");
 		haxeArgs.push("config/dbconfig@dbconfig");
 		
+		trace(haxeArgs);
 		RunScript.runCommand(workPath, "haxe", haxeArgs);
 
 		var sqlJar = null;
