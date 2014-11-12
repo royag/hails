@@ -175,10 +175,29 @@ class HailsBuilder
 		haxeArgs.push("config/dbconfig@dbconfig");
 		
 		RunScript.runCommand(workPath, "haxe", haxeArgs);
+
+		var sqlJar = null;
+		var driver = null;
+		if (dbtype != null) {
+			driver = "mysql-connector-java-5.1.31-bin.jar";
+			if (dbtype == "sqlserver") {
+				driver = "sqljdbc4.jar";
+			} else if (dbtype == "sqlite") {
+				driver = "sqlite-jdbc-3.7.2.jar";
+			}
+			sqlJar = hailsPath + "jar/" + driver;
+		}
 		
 		if (unitTest) {
 			Platform.println("[[[[ Unit Testing JAVA target ]]]]");
-			RunScript.runCommand(workPath, "java", ["-jar",dest+"/TestSuite.jar"]);
+			var cp = dest + "/TestSuite.jar";
+			if (sqlJar != null) {
+				cp += ";" + sqlJar;
+			}
+			
+			var testArgs = ["-cp", cp, "test.unit.TestSuite"];
+			trace(testArgs);
+			RunScript.runCommand(workPath, "java", testArgs);
 			return;
 		}
 		
@@ -196,15 +215,8 @@ class HailsBuilder
 		RunScript.runCommand(workPath, javaHome + "/bin/jar.exe", ["uvf", "javaout/WebApp.jar", "view"]);
 		
 		File.copy ("javaout/WebApp.jar", "javaout/war/WEB-INF/lib/WebApp.jar");
-		if (dbtype != null) {
-			var driver = "mysql-connector-java-5.1.31-bin.jar";
-			if (dbtype == "sqlserver") {
-				driver = "sqljdbc4.jar";
-			} else if (dbtype == "sqlite") {
-				driver = "sqlite-jdbc-3.7.2.jar";
-			}
-			Platform.println("Adding SQL driver to WEB-INF/lib: " + driver);
-			File.copy (hailsPath + "jar/" + driver, "javaout/war/WEB-INF/lib/" + driver);
+		if (sqlJar != null) {
+			File.copy (sqlJar, "javaout/war/WEB-INF/lib/" + driver);
 		}
 		var appName = appNameFromWorkPath(workPath);
 		var warFile = "javaout/"+appName+".war";
