@@ -201,7 +201,6 @@ class HailsBuilder
 		haxeArgs.push("-resource");
 		haxeArgs.push("config/dbconfig@dbconfig");
 		
-		trace(haxeArgs);
 		RunScript.runCommand(workPath, "haxe", haxeArgs);
 
 		var sqlJar = null;
@@ -224,7 +223,6 @@ class HailsBuilder
 			}
 			
 			var testArgs = ["-cp", cp, "test.unit.TestSuite"];
-			trace(testArgs);
 			RunScript.runCommand(workPath, "java", testArgs);
 			return;
 		}
