@@ -242,7 +242,7 @@ class RunScript {
 					}
 				if (flatFrom != null) {
 					itemDestination = itemDestination.substring(0, flatFrom.length) + 
-						StringTools.replace(itemDestination.substring(flatFrom.length), "/", "_");
+						StringTools.replace(StringTools.replace(itemDestination.substring(flatFrom.length), "/", "_"), "\\", "_");
 					//trace(destination);
 					//itemDestination = destination + "/" + StringTools.replace(file, "/", "_");
 				}					

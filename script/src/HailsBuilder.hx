@@ -133,6 +133,7 @@ class HailsBuilder
 		RunScript.runCommand(workPath, "haxe", haxeArgs);
 		
 		RunScript.recursiveCopy("view", dest + "/res/view", null, ".pl", dest + "/res/"); // !NB!: .pl(perl)-extension so it (usually) won't be able to load directly from webroot
+		addResourceDirsPhp(dest);
 		
 		if (unitTest) {
 			Platform.println("[[[[ Unit Testing PHP target ]]]]");
@@ -193,9 +194,24 @@ class HailsBuilder
 			if (lastSlash > 0) {
 				jarArgs = ["uvf", mainJar, "-C", resdir.substr(0, lastSlash), resdir.substr(lastSlash + 1)];
 			}
-			trace(jarArgs);
+			//trace(jarArgs);
 			RunScript.runCommand(workPath, javaHome + "/bin/jar.exe", jarArgs);
 		}
+	}
+	static function addResourceDirsPhp(dest:String) {
+		for (resdir in getResourceDirs()) {
+			var lastSlash = resdir.lastIndexOf("/");
+			if (lastSlash < 0) {
+				lastSlash = resdir.lastIndexOf("\\");
+			}
+			
+			var destDir = resdir;
+			if (lastSlash > 0) {
+				destDir = resdir.substr(lastSlash + 1);
+			}
+			//RunScript.recursiveCopy("view", dest + "/res/view", null, ".pl", dest + "/res/"); // !NB!: .pl(perl)-extension so it (usually) won't be able to load directly from webroot
+			RunScript.recursiveCopy(resdir, dest + "/res/" + destDir, null, ".pl", dest + "/res/"); // !NB!: .pl(perl)-extension so it (usually) won't be able to load directly from webroot
+		}		
 	}
 	
 	public static function buildJava(hailsPath:String, workPath:String, args:Array<String>, unitTest:Bool=false) {
