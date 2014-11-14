@@ -170,13 +170,42 @@ class HailsBuilder
 		}
 		return ret;
 	}
+	public static function getResourceDirs() : Array<String> {
+		var conf = getHaxeConfig();
+		if (conf == null) {
+			return new Array<String>();
+		}
+		var libList = conf.get("resourcedirs");
+		trace(libList);
+		if ((libList == null) || (libList.length == 0)) {
+			return new Array<String>();
+		}
+		return libList.split(";");
+	}
+	
+	static function addResourceDirsJava(workPath:String, javaHome:String, mainJar:String) {
+		for (resdir in getResourceDirs()) {
+			var lastSlash = resdir.lastIndexOf("/");
+			if (lastSlash < 0) {
+				lastSlash = resdir.lastIndexOf("\\");
+			}
+			var jarArgs = ["uvf", mainJar, resdir];
+			if (lastSlash > 0) {
+				jarArgs = ["uvf", mainJar, "-C", resdir.substr(0, lastSlash), resdir.substr(lastSlash + 1)];
+			}
+			trace(jarArgs);
+			RunScript.runCommand(workPath, javaHome + "/bin/jar.exe", jarArgs);
+		}
+	}
 	
 	public static function buildJava(hailsPath:String, workPath:String, args:Array<String>, unitTest:Bool=false) {
 		
 		var dest = "javaout";
 		var main = "controller.WebApp";
+		var mainJar = dest + "/WebApp.jar";
 		if (unitTest) {
 			main = "test.unit.TestSuite";
+			mainJar = dest + "/TestSuite-Debug.jar";
 		}
 		
 		var dbconfig = ConfigReader.getConfigFromFile("config/dbconfig");
@@ -206,7 +235,8 @@ class HailsBuilder
 		}
 		
 		RunScript.runCommand(workPath, "haxe", haxeArgs);
-
+		addResourceDirsJava(workPath, javaHome, mainJar);
+		
 		var sqlJar = null;
 		var driver = null;
 		if (dbtype != null) {
@@ -221,7 +251,7 @@ class HailsBuilder
 		
 		if (unitTest) {
 			Platform.println("[[[[ Unit Testing JAVA target ]]]]");
-			var cp = dest + "/TestSuite-Debug.jar";
+			var cp = mainJar;
 			if (sqlJar != null) {
 				cp += ";" + sqlJar;
 			}
@@ -242,9 +272,11 @@ class HailsBuilder
 		RunScript.recursiveCopy("war", "javaout/war");
 		
 		Platform.println("Adding views to WebApp.jar...");
-		RunScript.runCommand(workPath, javaHome + "/bin/jar.exe", ["uvf", "javaout/WebApp.jar", "view"]);
+		RunScript.runCommand(workPath, javaHome + "/bin/jar.exe", ["uvf", mainJar, "view"]);
 		
-		File.copy ("javaout/WebApp.jar", "javaout/war/WEB-INF/lib/WebApp.jar");
+		//addResourceDirsJava(workPath, javaHome, mainJar);
+		
+		File.copy (mainJar, "javaout/war/WEB-INF/lib/WebApp.jar");
 		if (sqlJar != null) {
 			File.copy (sqlJar, "javaout/war/WEB-INF/lib/" + driver);
 		}
