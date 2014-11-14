@@ -130,7 +130,10 @@ class HailsBuilder
 		haxeArgs.push("config/dbconfig@dbconfig.pl"); // !NB!: .pl(perl)-extension so it (usually) won't be able to load directly from webroot
 		
 		RunScript.removeDirectory(dest + "/res");
-		RunScript.runCommand(workPath, "haxe", haxeArgs);
+		var code = RunScript.runCommand(workPath, "haxe", haxeArgs);
+		if (code != 0) {
+			throw "build failed: " + code;
+		}
 		
 		RunScript.recursiveCopy("view", dest + "/res/view", null, ".pl", dest + "/res/"); // !NB!: .pl(perl)-extension so it (usually) won't be able to load directly from webroot
 		addResourceDirsPhp(dest);
