@@ -71,7 +71,7 @@ class FakeWebContext implements IWebContext
 	public function setSession(key:String, value:Dynamic) : Void {
 	}
 	public function getSession(key:String) : Dynamic {
-		return { };
+		return "";
 	}
 	public var clientHeaders:StringMap<String> = new StringMap<String>();
 	public function getClientHeader(key:String) : String {

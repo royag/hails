@@ -201,6 +201,10 @@ class HailsBuilder
 		haxeArgs.push("-resource");
 		haxeArgs.push("config/dbconfig@dbconfig");
 		
+		if (unitTest) {
+			haxeArgs.push("-debug");
+		}
+		
 		RunScript.runCommand(workPath, "haxe", haxeArgs);
 
 		var sqlJar = null;
@@ -217,7 +221,7 @@ class HailsBuilder
 		
 		if (unitTest) {
 			Platform.println("[[[[ Unit Testing JAVA target ]]]]");
-			var cp = dest + "/TestSuite.jar";
+			var cp = dest + "/TestSuite-Debug.jar";
 			if (sqlJar != null) {
 				cp += ";" + sqlJar;
 			}
