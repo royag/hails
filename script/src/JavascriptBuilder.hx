@@ -13,7 +13,7 @@ class JavascriptBuilder
 
 	public function new() {	}
 	
-	public static function build(hailsPath:String, workPath:String, dest:String) {
+	public static function build(hailsPath:String, workPath:String, dest:String, define:String) {
 		var directory = "javascript";
 		var controllers:Array<String> = new Array<String>();
 		if (FileSystem.exists (directory) && FileSystem.isDirectory (directory)) {
@@ -37,6 +37,9 @@ class JavascriptBuilder
 					Platform.println("Building JS-file " + outfile);
 					if (outfile != null) {
 						var haxeArgs = ["-js", outfile, "-main", main, "-cp", ".", "-lib", "hails"].concat(getHaxeLibArgs());
+						if (define != null) {
+							haxeArgs = haxeArgs.concat(["-D", define]);
+						}
 						RunScript.runCommand(workPath, "haxe", haxeArgs);
 					}
 				}

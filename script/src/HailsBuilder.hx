@@ -144,7 +144,7 @@ class HailsBuilder
 		
 		RunScript.recursiveCopy(hailsPath + "templates/phpnbproject", dest + "/nbproject");
 		
-		JavascriptBuilder.build(hailsPath, workPath, dest);
+		JavascriptBuilder.build(hailsPath, workPath, dest, "phpweb");
 		
 		if (unitTest) {
 			Platform.println("[[[[ Unit Testing PHP target ]]]]");
@@ -312,7 +312,7 @@ class HailsBuilder
 			File.copy (sqlJar, "javaout/war/WEB-INF/lib/" + driver);
 		}
 		
-		JavascriptBuilder.build(hailsPath, workPath, "javaout/war");
+		JavascriptBuilder.build(hailsPath, workPath, "javaout/war", "javaweb");
 		
 		var appName = appNameFromWorkPath(workPath);
 		var warFile = "javaout/"+appName+".war";
