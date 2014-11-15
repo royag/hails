@@ -140,6 +140,8 @@ class HailsBuilder
 		RunScript.recursiveCopy("view", dest + "/res/view", null, ".pl", dest + "/res/"); // !NB!: .pl(perl)-extension so it (usually) won't be able to load directly from webroot
 		addResourceDirsPhp(dest);
 		
+		RunScript.recursiveCopy(hailsPath + "templates/phpnbproject", dest + "/nbproject");
+		
 		if (unitTest) {
 			Platform.println("[[[[ Unit Testing PHP target ]]]]");
 			RunScript.runCommand(workPath, "php", [dest + "/index.php"]);
@@ -182,7 +184,7 @@ class HailsBuilder
 			return new Array<String>();
 		}
 		var libList = conf.get("resourcedirs");
-		trace(libList);
+		//trace(libList);
 		if ((libList == null) || (libList.length == 0)) {
 			return new Array<String>();
 		}
