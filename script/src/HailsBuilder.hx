@@ -120,6 +120,8 @@ class HailsBuilder
 	public static function buildPhp(hailsPath:String, workPath:String, args:Array<String>, unitTest:Bool=false) {
 		createWebAppHx(hailsPath, workPath);
 		var dest = "phpout";
+		RunScript.removeDirectory(dest + "/res");
+		RunScript.removeDirectory(dest + "/lib");
 		RunScript.removeDirectory(dest);
 		var main = "controller.WebApp";
 		if (unitTest) {
@@ -141,6 +143,8 @@ class HailsBuilder
 		addResourceDirsPhp(dest);
 		
 		RunScript.recursiveCopy(hailsPath + "templates/phpnbproject", dest + "/nbproject");
+		
+		JavascriptBuilder.build(hailsPath, workPath, dest);
 		
 		if (unitTest) {
 			Platform.println("[[[[ Unit Testing PHP target ]]]]");
@@ -307,6 +311,9 @@ class HailsBuilder
 		if (sqlJar != null) {
 			File.copy (sqlJar, "javaout/war/WEB-INF/lib/" + driver);
 		}
+		
+		JavascriptBuilder.build(hailsPath, workPath, "javaout/war");
+		
 		var appName = appNameFromWorkPath(workPath);
 		var warFile = "javaout/"+appName+".war";
 		Platform.println("Assembling WAR-file: " + warFile);

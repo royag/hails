@@ -15,6 +15,9 @@ import haxe.Resource;
 
 class HailsBaseController {
 	var WebCtx:IWebContext;
+	public function getContext() {
+		return WebCtx;
+	}
 	
 	public function new(initialAction:String, ctx:IWebContext) {
 		this.WebCtx = ctx;
