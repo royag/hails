@@ -136,14 +136,15 @@ class JavaWebContext implements IWebContext
 	}
 	
 	public function getRelativeURI() : String {
-		var sp = request.getContextPath();
-		//var serpath = request.getServletPath();
+		var ctxpath = request.getContextPath();
+		var servpath = request.getServletPath();
 		var uri = getURI();
 		
-		//return sp + "**" + serpath + "**" + uri;
-		
-		if (uri.indexOf(sp) == 0) {
-			return uri.substring(sp.length);
+		if (uri.indexOf(ctxpath) == 0) {
+			uri = uri.substring(ctxpath.length);
+		}
+		if (uri.indexOf(servpath) == 0) {
+			uri = uri.substring(servpath.length);
 		}
 		return uri;
 	}

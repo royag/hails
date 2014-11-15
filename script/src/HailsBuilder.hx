@@ -89,6 +89,7 @@ class HailsBuilder
 	
 	public static function buildNeko(hailsPath:String, workPath:String, args:Array<String>, unitTest:Bool=false) {
 		createWebAppHx(hailsPath, workPath);
+		RunScript.removeDirectory("nekoout");
 		RunScript.mkdir("nekoout");
 		var dest = "./nekoout/index.n";
 		var main = "controller.WebApp";
@@ -119,6 +120,7 @@ class HailsBuilder
 	public static function buildPhp(hailsPath:String, workPath:String, args:Array<String>, unitTest:Bool=false) {
 		createWebAppHx(hailsPath, workPath);
 		var dest = "phpout";
+		RunScript.removeDirectory(dest);
 		var main = "controller.WebApp";
 		if (unitTest) {
 			dest = "phptest";
@@ -220,6 +222,7 @@ class HailsBuilder
 	public static function buildJava(hailsPath:String, workPath:String, args:Array<String>, unitTest:Bool=false) {
 		
 		var dest = "javaout";
+		RunScript.removeDirectory(dest + "/src");
 		var main = "controller.WebApp";
 		var mainJar = dest + "/WebApp.jar";
 		if (unitTest) {
@@ -289,6 +292,9 @@ class HailsBuilder
 		
 		RunScript.removeDirectory("javaout/war");
 		RunScript.recursiveCopy("war", "javaout/war");
+
+		RunScript.recursiveCopy(hailsPath + "templates/javanbproject", "javaout/nbproject");
+		
 		
 		Platform.println("Adding views to WebApp.jar...");
 		RunScript.runCommand(workPath, javaHome + "/bin/jar.exe", ["uvf", mainJar, "view"]);
@@ -309,7 +315,7 @@ class HailsBuilder
 		if (args.length > 2 && args[2] == "run") {
 			RunScript.runCommand(workPath, javaHome + "/bin/java.exe", javaArgs);
 		} else if (args.length > 2 && args[2] == "livetest") {
-			HailsLiveTester.runThenTest(workPath, javaHome + "/bin/java.exe", javaArgs, "http://localhost:8080/"); // +appName+"/");
+			HailsLiveTester.runThenTest(workPath, javaHome + "/bin/java.exe", javaArgs, "http://localhost:8080/app/"); // +appName+"/");
 		}
 	}
 	
