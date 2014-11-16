@@ -15,6 +15,8 @@ import sys.FileSystem;
 class HailsBuilder
 {
 
+	public static var WEB_FOLDER = "war";
+	
 	public static function build(hailsPath:String, workPath:String, args:Array<String>, unitTest:Bool = false) {
 		if (unitTest && args.length == 1) {
 			buildJava(hailsPath, workPath, args, unitTest);
@@ -143,6 +145,13 @@ class HailsBuilder
 		addResourceDirsPhp(dest);
 		
 		RunScript.recursiveCopy(hailsPath + "templates/phpnbproject", dest + "/nbproject");
+		
+		if (FileSystem.exists (WEB_FOLDER) && FileSystem.isDirectory (WEB_FOLDER)) {
+		} else {
+			RunScript.recursiveCopy(hailsPath + "templates/war", WEB_FOLDER);
+		}
+		RunScript.removeDirectory("javaout/war");
+		RunScript.recursiveCopy(WEB_FOLDER, dest, ["META-INF", "WEB-INF"]);		
 		
 		JavascriptBuilder.build(hailsPath, workPath, dest, "phpweb");
 		
@@ -289,7 +298,7 @@ class HailsBuilder
 			return;
 		}
 		
-		var directory = "war";
+		var directory = WEB_FOLDER;
 		if (FileSystem.exists (directory) && FileSystem.isDirectory (directory)) {
 			
 		} else {
@@ -297,7 +306,7 @@ class HailsBuilder
 		}
 		
 		RunScript.removeDirectory("javaout/war");
-		RunScript.recursiveCopy("war", "javaout/war");
+		RunScript.recursiveCopy(WEB_FOLDER, "javaout/war");
 
 		RunScript.recursiveCopy(hailsPath + "templates/javanbproject", "javaout/nbproject");
 		
