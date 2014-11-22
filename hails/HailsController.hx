@@ -14,13 +14,24 @@ class HailsController extends HailsBaseController
 {
 	static var ERROR_MESSAGE = 'ERROR_MESSAGE';
 	static var INFO_MESSAGE = 'INFO_MESSAGE';
+	var vars:StringMap<String> = null;
 	
-	public function new(initialAction:String, ctx:IWebContext) {
+	
+	
+	public function new(initialAction:String, ctx:IWebContext, vars:StringMap<String>) {
 		super(initialAction, ctx);
 		errorMessage = getSession(ERROR_MESSAGE);
 		infoMessage = getSession(INFO_MESSAGE);
 		setSession(INFO_MESSAGE, null);
 		setSession(ERROR_MESSAGE, null);
+		this.vars = vars;
+	}
+	
+	public function getVar(name:String) : String {
+		if (vars == null) {
+			return null;
+		}
+		return vars.get(name);
 	}
 	
 	/**

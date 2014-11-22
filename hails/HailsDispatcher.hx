@@ -68,7 +68,7 @@ class HailsDispatcher {
 				return;
 			}
 			
-			var constructorParams:Array<Dynamic> = [ctrl.controllerFunction, ctx];
+			var constructorParams:Array<Dynamic> = [ctrl.controllerFunction, ctx, ctrl.variables];
 			var controller:HailsController = Type.createInstance(ctrl.controller, constructorParams);
 			var actionMethod = Reflect.field(controller, ctrl.controllerFunction);
 			var simpleControllerName = Type.getClassName(ctrl.controller).split(".").pop();

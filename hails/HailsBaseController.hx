@@ -8,6 +8,7 @@ package hails;
 import hails.config.HailsConfig;
 import hails.html.ViewTool;
 import hails.util.StringUtil;
+import haxe.Json;
 import haxe.Template;
 import sys.io.File;
 import hails.hailsservlet.IWebContext;
@@ -198,6 +199,17 @@ class HailsBaseController {
 		setAsRendered();
 		WebCtx.print(outputData);
 	}
+	
+	function renderJson(d:Dynamic) {
+		getContext().setContentType("application/json");
+		renderRaw(Json.stringify(d));
+	}
+	
+	function renderJsonPreformatted(s:String) {
+		getContext().setContentType("application/json");
+		renderRaw(s);
+	}
+	
 	function renderRawBinary(outputData) {
 		setAsRendered();
 		WebCtx.printBinary(outputData);
