@@ -38,7 +38,7 @@ class HailsControllerMethodFinder
 							mustBeAction = vars.get("$action");
 							vars.remove("$action");
 						}
-						var funcName = findProperFunction(c, mustBeAction, ctx);
+						var funcName = findProperFunction(c, mustBeAction, ctx, vars);
 						if (funcName != null) {
 							ret.controller = c;
 							ret.controllerFunction = funcName;
@@ -54,7 +54,7 @@ class HailsControllerMethodFinder
 						var className = Type.getClassName(c).split(".").pop();
 						if (className == StringUtil.camelize(comp[0]) + "Controller") {
 							var mustBeAction:String = (comp.length == 2 ? comp[1] : null);
-							var funcName = findProperFunction(c, mustBeAction, ctx);
+							var funcName = findProperFunction(c, mustBeAction, ctx, null);
 							if (funcName != null) {
 								ret.controller = c;
 								ret.controllerFunction = funcName;
@@ -90,7 +90,7 @@ class HailsControllerMethodFinder
 		return functionMetaMatchesHttpMethod(funcMeta, ctx.getMethod());
 	}
 	
-	static function findProperFunction(c: Class<HailsController>, mustBeAction:String, ctx : IWebContext) : String {
+	static function findProperFunction(c: Class<HailsController>, mustBeAction:String, ctx : IWebContext, vars:StringMap<String>) : String {
 		var meta = Meta.getFields(c);
 		for (funcName in Reflect.fields(meta)) {
 			var funcMeta = Reflect.field(meta,funcName);
@@ -102,8 +102,30 @@ class HailsControllerMethodFinder
 						if (StringUtil.camelizeWithFirstAsLower(mustBeAction) == funcName) {
 							isCandidate = true;
 						}
-					} else if (actionVal[0] == mustBeAction) {
-						isCandidate = true;
+					} else {
+						var av:String = actionVal[0];
+						if (av.indexOf("/") > -1 && vars != null) {
+							var avElems = av.split("/");
+							var actualAction = avElems[0];
+							if (mustBeAction == actualAction) {
+								avElems.remove(actualAction);
+								var i = 0;
+								for (v in vars.keys()) {
+									if ((avElems.length < i + 1) || (vars.get(v) == null)) {
+										isCandidate = false;
+										break;
+									} else if (avElems[i] == "{" + v + "}") {
+										isCandidate = true;
+										i++;
+									}
+								}
+								if (avElems.length > i) {
+									isCandidate = false;
+								}
+							}
+						} else if (actionVal[0] == mustBeAction) {
+							isCandidate = true;
+						}
 					}
 				}
 			} else {

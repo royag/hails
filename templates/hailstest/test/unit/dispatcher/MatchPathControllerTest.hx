@@ -6,6 +6,7 @@ import hails.HailsControllerMethodFinder;
 import hails.HailsDispatcher;
 import hails.util.test.FakeWebContext;
 import haxe.ds.StringMap;
+import haxe.PosInfos;
 import haxe.rtti.Meta;
 import haxe.unit.TestCase;
 import test.unit.dispatcher.InitControllerTest;
@@ -73,7 +74,9 @@ class PathWithActionAndOptionalParamController extends HailsController {
 	public function someTest() {}
 	@action("post_only")
 	@POST
-	public function onlyWorksWithPost() {}
+	public function onlyWorksWithPost() { }
+	@action("not_optional/{param1}")
+	public function notOptional() { };
 }
 
 class ActionAndPathLessController extends HailsController {
@@ -113,6 +116,9 @@ class MatchPathControllerTest extends TestCase
 		doTest("/actTwo/index/myvalue", "GET", PathWithActionAndOptionalParamController, "index", strmap({"param1" : "myvalue"}));
 		doTest("/actTwo/post_only/myvalue", "GET", null,null,null);
 		doTest("/actTwo/post_only/myvalue", "POST", PathWithActionAndOptionalParamController, "onlyWorksWithPost", strmap({"param1" : "myvalue"}));
+
+		doTest("/actTwo/not_optional/", "GET", null,null,null);
+		doTest("/actTwo/not_optional/myvalue", "GET", PathWithActionAndOptionalParamController, "notOptional", strmap({"param1" : "myvalue"}));
 	}
 		
 		
@@ -170,6 +176,9 @@ class MatchPathControllerTest extends TestCase
 		var ctx = FakeWebContext.fromRelativeUriAndMethod(uri, method);
 		var res = HailsControllerMethodFinder.findControllerMethodParams(controllers, ctx);
 		if (expController == null) {
+			if (res != null) {
+				trace(res.variables);
+			}
 			assertFalse(res != null);
 			return;
 		}
