@@ -136,9 +136,9 @@ class HailsControllerMethodFinder
 				if (StringTools.startsWith(d, "{") && StringTools.endsWith(d, "}")) {
 					var varName = d.substr(1, d.length - 2);
 					var optional = false;
-					if (StringTools.endsWith(varName, "?")) {
+					if (StringTools.startsWith(varName, "?")) {
 						optional = true;
-						varName = varName.substring(0, varName.length - 1);
+						varName = varName.substring(1);
 					}
 					if ((!optional) && (a == null)) {
 						return null;

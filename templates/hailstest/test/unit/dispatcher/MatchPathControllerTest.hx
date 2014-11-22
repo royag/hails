@@ -18,7 +18,7 @@ class MainTestController extends HailsController {
 	public function store() {}
 }
 
-@path("/user/{userid?}")
+@path("/user/{?userid}")
 class UserTestController extends HailsController {
 	@GET
 	public function index() {}
@@ -65,7 +65,7 @@ class PathWithActionController extends HailsController {
 	public function onlyWorksWithPost() {}
 }
 
-@path("actTwo/{$action}/{param1?}/")
+@path("actTwo/{$action}/{?param1}/")
 class PathWithActionAndOptionalParamController extends HailsController {
 	@action
 	public function index() {}
