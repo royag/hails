@@ -52,7 +52,12 @@ class HailsDispatcher {
 	
 	function pageNotFound(ctx:IWebContext) : Void {
 		ctx.setReturnCode(404);
-		ctx.print("404 Page not foudn");		
+		try {
+			ctx.setContentType("text/html");
+			ctx.print(HailsBaseController.getViewContent("/404.html"));
+		} catch (ex:Dynamic) {
+			ctx.print("404 Page not found");
+		}
 	}
 	
 	public static function handleRequest(ctx:IWebContext) : Void {

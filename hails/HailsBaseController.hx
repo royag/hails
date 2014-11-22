@@ -94,7 +94,7 @@ class HailsBaseController {
 		this.shouldRender = false;
 	}
 	
-	private function getHtml(fileName:String, ?vars:Dynamic, ?layout:String, ?callBacks:Dynamic) : String {
+	public static function getViewContent(fileName) {
 		var content:String;
 		if (HailsConfig.loadViewAsResource()) {
 			//trace("so filename is : " + fileName);
@@ -109,6 +109,11 @@ class HailsBaseController {
 		} else {
 			content = File.getContent(fileName);
 		}
+		return content;
+	}
+	
+	private function getHtml(fileName:String, ?vars:Dynamic, ?layout:String, ?callBacks:Dynamic) : String {
+		var content:String = getViewContent(fileName);
 		var t = new Template(content);
 		var contentHtml = t.execute(vars, callBacks);
 		if (layout != null) {
