@@ -15,6 +15,9 @@ class RunScript {
 	private static var isWindows:Bool;
 	private static var hailsDir:String;
 	
+	public static var verbose = false;
+	
+	
 	public static function main () {
 		
 		var isJava = false;
@@ -44,6 +47,9 @@ class RunScript {
 		
 		var args = Sys.args ();
 		var command = args[0];
+		
+		verbose = (args.indexOf("-v") > -1);
+		//trace(verbose);
 		
 		// When the command-line tools are called from haxelib, 
 		// the last argument is the project directory and the
@@ -191,7 +197,7 @@ class RunScript {
 		return result;
 	}
 	
-    public static function recursiveCopy (source:String, destination:String, ignore:Array <String> = null, addExtention:String = null, flatFrom:String=null) {
+    public static function recursiveCopy (source:String, destination:String, ignore:Array <String> = null, addExtention:String = null, flatFrom:String=null, silent:Bool = false) {
 		
 		if (ignore == null) {
 			
@@ -233,7 +239,7 @@ class RunScript {
 				var itemSource:String = source + "/" + file;
 				
 				if (FileSystem.isDirectory (itemSource)) {
-					recursiveCopy (itemSource, itemDestination, ignore, addExtention, flatFrom);
+					recursiveCopy (itemSource, itemDestination, ignore, addExtention, flatFrom, silent);
 					
 				} else {
 					
@@ -245,8 +251,10 @@ class RunScript {
 						StringTools.replace(StringTools.replace(itemDestination.substring(flatFrom.length), "/", "_"), "\\", "_");
 					//trace(destination);
 					//itemDestination = destination + "/" + StringTools.replace(file, "/", "_");
-				}					
-					Sys.println ("Copying " + itemSource + " to " + itemDestination);
+				}	
+					if (!silent) {
+						Sys.println ("Copying " + itemSource + " to " + itemDestination);
+					}
 					File.copy (itemSource, itemDestination);
 					
 				}

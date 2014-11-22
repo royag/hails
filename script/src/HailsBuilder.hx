@@ -141,17 +141,21 @@ class HailsBuilder
 			throw "build failed: " + code;
 		}
 		
-		RunScript.recursiveCopy("view", dest + "/res/view", null, ".pl", dest + "/res/"); // !NB!: .pl(perl)-extension so it (usually) won't be able to load directly from webroot
+		Sys.println("Copying resources...");
+		RunScript.recursiveCopy("view", dest + "/res/view", null, ".pl", dest + "/res/", !RunScript.verbose); // !NB!: .pl(perl)-extension so it (usually) won't be able to load directly from webroot
 		addResourceDirsPhp(dest);
 		
-		RunScript.recursiveCopy(hailsPath + "templates/phpnbproject", dest + "/nbproject");
+		Sys.println("Copying nbproject...");
+		RunScript.recursiveCopy(hailsPath + "templates/phpnbproject", dest + "/nbproject", null, null, null, !RunScript.verbose);
 		
 		if (FileSystem.exists (WEB_FOLDER) && FileSystem.isDirectory (WEB_FOLDER)) {
 		} else {
 			RunScript.recursiveCopy(hailsPath + "templates/war", WEB_FOLDER);
 		}
 		RunScript.removeDirectory("javaout/war");
-		RunScript.recursiveCopy(WEB_FOLDER, dest, ["META-INF", "WEB-INF"]);		
+		
+		Sys.println("Copying from " + WEB_FOLDER + "...");
+		RunScript.recursiveCopy(WEB_FOLDER, dest, ["META-INF", "WEB-INF"], null, null, !RunScript.verbose);		
 		
 		JavascriptBuilder.build(hailsPath, workPath, dest, "phpweb");
 		
@@ -230,7 +234,7 @@ class HailsBuilder
 				destDir = resdir.substr(lastSlash + 1);
 			}
 			//RunScript.recursiveCopy("view", dest + "/res/view", null, ".pl", dest + "/res/"); // !NB!: .pl(perl)-extension so it (usually) won't be able to load directly from webroot
-			RunScript.recursiveCopy(resdir, dest + "/res/" + destDir, null, ".pl", dest + "/res/"); // !NB!: .pl(perl)-extension so it (usually) won't be able to load directly from webroot
+			RunScript.recursiveCopy(resdir, dest + "/res/" + destDir, null, ".pl", dest + "/res/", !RunScript.verbose); // !NB!: .pl(perl)-extension so it (usually) won't be able to load directly from webroot
 		}		
 	}
 	
@@ -306,7 +310,9 @@ class HailsBuilder
 		}
 		
 		RunScript.removeDirectory("javaout/war");
-		RunScript.recursiveCopy(WEB_FOLDER, "javaout/war");
+
+		Sys.println("Copying from " + WEB_FOLDER + "...");
+		RunScript.recursiveCopy(WEB_FOLDER, "javaout/war", null, null, null, !RunScript.verbose);
 
 		RunScript.recursiveCopy(hailsPath + "templates/javanbproject", "javaout/nbproject");
 		
