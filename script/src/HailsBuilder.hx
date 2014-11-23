@@ -93,22 +93,33 @@ class HailsBuilder
 		createWebAppHx(hailsPath, workPath);
 		RunScript.removeDirectory("nekoout");
 		RunScript.mkdir("nekoout");
-		var dest = "./nekoout/index.n";
+		var dest = "./nekoout";
+		var destNekoFile = "./nekoout/index.n";
 		var main = "controller.WebApp";
 		if (unitTest) {
 			dest = "./nekoout/unittest.n";
 			main = "test.unit.TestSuite";
 		}
-		var haxeArgs = ["-neko", dest, "-main", main, "-cp", ".", "-lib", "hails"].concat(getHaxeLibArgs());
+		var haxeArgs = ["-neko", destNekoFile, "-main", main, "-cp", ".", "-lib", "hails"].concat(getHaxeLibArgs());
 		
 		haxeArgs.push("-resource");
 		haxeArgs.push("config/dbconfig@dbconfig");
 		
 		RunScript.runCommand(workPath, "haxe", haxeArgs);
 		
+		if (FileSystem.exists (WEB_FOLDER) && FileSystem.isDirectory (WEB_FOLDER)) {
+		} else {
+			RunScript.recursiveCopy(hailsPath + "templates/war", WEB_FOLDER);
+		}
+		
+		Sys.println("Copying from " + WEB_FOLDER + "...");
+		RunScript.recursiveCopy(WEB_FOLDER, dest, ["META-INF", "WEB-INF"], null, null, !RunScript.verbose);		
+		
+		JavascriptBuilder.build(hailsPath, workPath, dest, "nekoweb");		
+		
 		if (unitTest) {
 			Platform.println("[[[[ Unit Testing NEKO target ]]]]");
-			RunScript.runCommand(workPath, "neko", [dest]);
+			RunScript.runCommand(workPath, "neko", [destNekoFile]);
 		} else {
 			var nekoArgs = ["server", "-p", "2000", "-h", "localhost", "-d", "nekoout", "-rewrite"];
 			if (args.length > 2 && args[2] == "run") {
@@ -152,7 +163,7 @@ class HailsBuilder
 		} else {
 			RunScript.recursiveCopy(hailsPath + "templates/war", WEB_FOLDER);
 		}
-		RunScript.removeDirectory("javaout/war");
+		//RunScript.removeDirectory("javaout/war");
 		
 		Sys.println("Copying from " + WEB_FOLDER + "...");
 		RunScript.recursiveCopy(WEB_FOLDER, dest, ["META-INF", "WEB-INF"], null, null, !RunScript.verbose);		
