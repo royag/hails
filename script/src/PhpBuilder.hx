@@ -32,10 +32,14 @@ class PhpBuilder extends HailsBuilder
 		
 		var dest = "phpout";
 		if (!hasOnly) {
-			createWebAppHx(hailsPath, workPath);
 			RunScript.removeDirectory(dest + "/res");
 			RunScript.removeDirectory(dest + "/lib");
 			RunScript.removeDirectory(dest);
+		}
+		
+		if ((!hasOnly) || (only.indexOf("php") >= 0)) {
+			createWebAppHx(hailsPath, workPath);
+
 			var main = "controller.WebApp";
 			if (unitTest) {
 				dest = "phptest";
@@ -47,6 +51,7 @@ class PhpBuilder extends HailsBuilder
 			haxeArgs.push("config/dbconfig@dbconfig.pl"); // !NB!: .pl(perl)-extension so it (usually) won't be able to load directly from webroot
 			
 			RunScript.removeDirectory(dest + "/res");
+			Sys.println("compiling PHP...");
 			var code = RunScript.runCommand(workPath, "haxe", haxeArgs);
 			if (code != 0) {
 				throw "build failed: " + code;
