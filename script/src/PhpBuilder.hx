@@ -26,47 +26,58 @@ class PhpBuilder extends HailsBuilder
 		}		
 	}
 	
-	public function build(hailsPath:String, workPath:String, args:Array<String>, unitTest:Bool=false) {
-		createWebAppHx(hailsPath, workPath);
+	public function build(hailsPath:String, workPath:String, args:Array<String>, unitTest:Bool = false) {
+		var only = getArgs_Only(args);
+		var hasOnly:Bool = only != null;
+		
 		var dest = "phpout";
-		RunScript.removeDirectory(dest + "/res");
-		RunScript.removeDirectory(dest + "/lib");
-		RunScript.removeDirectory(dest);
-		var main = "controller.WebApp";
-		if (unitTest) {
-			dest = "phptest";
-			main = "test.unit.TestSuite";
-		}		
-		var haxeArgs = ["-php", dest, "-main", main, "-cp", ".", "-lib", "hails"].concat(getHaxeLibArgs());
-		
-		haxeArgs.push("-resource");
-		haxeArgs.push("config/dbconfig@dbconfig.pl"); // !NB!: .pl(perl)-extension so it (usually) won't be able to load directly from webroot
-		
-		RunScript.removeDirectory(dest + "/res");
-		var code = RunScript.runCommand(workPath, "haxe", haxeArgs);
-		if (code != 0) {
-			throw "build failed: " + code;
+		if (!hasOnly) {
+			createWebAppHx(hailsPath, workPath);
+			RunScript.removeDirectory(dest + "/res");
+			RunScript.removeDirectory(dest + "/lib");
+			RunScript.removeDirectory(dest);
+			var main = "controller.WebApp";
+			if (unitTest) {
+				dest = "phptest";
+				main = "test.unit.TestSuite";
+			}		
+			var haxeArgs = ["-php", dest, "-main", main, "-cp", ".", "-lib", "hails"].concat(getHaxeLibArgs());
+			
+			haxeArgs.push("-resource");
+			haxeArgs.push("config/dbconfig@dbconfig.pl"); // !NB!: .pl(perl)-extension so it (usually) won't be able to load directly from webroot
+			
+			RunScript.removeDirectory(dest + "/res");
+			var code = RunScript.runCommand(workPath, "haxe", haxeArgs);
+			if (code != 0) {
+				throw "build failed: " + code;
+			}
 		}
 		
-		Sys.println("Copying resources...");
-		RunScript.recursiveCopy("view", dest + "/res/view", null, ".pl", dest + "/res/", !RunScript.verbose); // !NB!: .pl(perl)-extension so it (usually) won't be able to load directly from webroot
-		addResourceDirsPhp(dest);
-		
-		Sys.println("Copying nbproject...");
-		RunScript.recursiveCopy(hailsPath + "templates/phpnbproject", dest + "/nbproject", null, null, null, !RunScript.verbose);
-		
+		if ((!hasOnly) || (only.indexOf("res") >= 0)) {
+			Sys.println("Copying resources...");
+			RunScript.recursiveCopy("view", dest + "/res/view", null, ".pl", dest + "/res/", !RunScript.verbose); // !NB!: .pl(perl)-extension so it (usually) won't be able to load directly from webroot
+			addResourceDirsPhp(dest);
+		}
 		var webFolder = WEB_FOLDER;
 		
-		if (FileSystem.exists (webFolder) && FileSystem.isDirectory (webFolder)) {
-		} else {
-			RunScript.recursiveCopy(hailsPath + "templates/war", webFolder);
+		if (!hasOnly) {
+			Sys.println("Copying nbproject...");
+			RunScript.recursiveCopy(hailsPath + "templates/phpnbproject", dest + "/nbproject", null, null, null, !RunScript.verbose);
+			if (FileSystem.exists (webFolder) && FileSystem.isDirectory (webFolder)) {
+			} else {
+				RunScript.recursiveCopy(hailsPath + "templates/war", webFolder);
+			}
 		}
 		//RunScript.removeDirectory("javaout/war");
 		
-		Sys.println("Copying from " + webFolder + "...");
-		RunScript.recursiveCopy(WEB_FOLDER, dest, ["META-INF", "WEB-INF"], null, null, !RunScript.verbose);		
+		if ((!hasOnly) || (only.indexOf("web") >= 0)) {
+			Sys.println("Copying from " + webFolder + "...");
+			RunScript.recursiveCopy(WEB_FOLDER, dest, ["META-INF", "WEB-INF"], null, null, !RunScript.verbose);	
+		}
 		
-		buildJs(hailsPath, workPath, dest, "phpweb");
+		if ((!hasOnly) || (only.indexOf("js") >= 0)) {
+			buildJs(hailsPath, workPath, dest, "phpweb");
+		}
 		
 		if (unitTest) {
 			Platform.println("[[[[ Unit Testing PHP target ]]]]");

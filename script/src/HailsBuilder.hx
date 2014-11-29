@@ -35,6 +35,16 @@ class HailsBuilder
 		}
 	}
 	
+	function getArgs_Only(args:Array<String>) : Array<String> {
+		for (arg in args) {
+			if (StringTools.startsWith(arg, "-only:")) {
+				var onlyList = arg.substr("-only:".length);
+				return onlyList.split(":");
+			}
+		}
+		return null;
+	}
+	
 	public function createWebAppHx(hailsPath:String, workPath:String) {
 		var webAppHx = "package controller;\n" +
 			"import hails.Main;\n" +
