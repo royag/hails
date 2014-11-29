@@ -7,13 +7,14 @@ import haxe.io.Path;
 import sys.io.File;
 import sys.io.Process;
 import sys.FileSystem;
+import hails.platform.Platform;
 
-class JavascriptBuilder
+class JavascriptBuilder extends HailsBuilder
 {
 
 	public function new() {	}
 	
-	public static function build(hailsPath:String, workPath:String, dest:String, define:String) {
+	public function build(hailsPath:String, workPath:String, dest:String, define:String) {
 		var directory = "javascript";
 		var controllers:Array<String> = new Array<String>();
 		if (FileSystem.exists (directory) && FileSystem.isDirectory (directory)) {
@@ -47,8 +48,9 @@ class JavascriptBuilder
 		}
 	}
 	
-	public static function getNeededLibs() : Array<String> {
-		var conf = HailsBuilder.getHaxeConfig();
+	
+	public override function getNeededLibs() : Array<String> {
+		var conf = getHaxeConfig();
 		if (conf == null) {
 			return new Array<String>();
 		}
@@ -58,7 +60,7 @@ class JavascriptBuilder
 		}
 		return libList.split(",");
 	}
-	public static function getHaxeLibArgs() {
+	public override function getHaxeLibArgs() {
 		var ret = new Array<String>();
 		for (lib in getNeededLibs()) {
 			ret.push("-lib");

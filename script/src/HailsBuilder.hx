@@ -7,29 +7,26 @@ import haxe.io.Path;
 import sys.io.File;
 import sys.io.Process;
 import sys.FileSystem;
+import PhpBuilder;
 
-/**
- * ...
- * @author Roy
- */
 class HailsBuilder
 {
 
-	public static var WEB_FOLDER = "war";
+	public var WEB_FOLDER = "war";
 	
 	public static function build(hailsPath:String, workPath:String, args:Array<String>, unitTest:Bool = false) {
 		if (unitTest && args.length == 1) {
-			buildJava(hailsPath, workPath, args, unitTest);
-			buildNeko(hailsPath, workPath, args, unitTest);
-			buildPhp(hailsPath, workPath, args,unitTest);
+			new JavaBuilder().build(hailsPath, workPath, args, unitTest);
+			new NekoBuilder().build(hailsPath, workPath, args, unitTest);
+			new PhpBuilder().build(hailsPath, workPath, args,unitTest);
 		} else {
 			var target = args[1];
 			if (target == "java") {
-				buildJava(hailsPath, workPath, args,unitTest);
+				new JavaBuilder().build(hailsPath, workPath, args,unitTest);
 			} else if (target == "php") {
-				buildPhp(hailsPath, workPath, args,unitTest);
+				new PhpBuilder().build(hailsPath, workPath, args,unitTest);
 			} else if (target == "neko") {
-				buildNeko(hailsPath, workPath, args,unitTest);
+				new NekoBuilder().build(hailsPath, workPath, args,unitTest);
 			//} else if (target == "cpp") {
 			//	buildCpp(hailsPath, workPath, args);
 			} else {
@@ -38,12 +35,10 @@ class HailsBuilder
 		}
 	}
 	
-	public static function createWebAppHx(hailsPath:String, workPath:String) {
-		
+	public function createWebAppHx(hailsPath:String, workPath:String) {
 		var webAppHx = "package controller;\n" +
 			"import hails.Main;\n" +
 			"import hails.HailsDispatcher;\n";
-
 		var directory = "controller";
 		var controllers:Array<String> = new Array<String>();
 		if (FileSystem.exists (directory) && FileSystem.isDirectory (directory)) {
@@ -56,7 +51,6 @@ class HailsBuilder
 				}
 			}
 		}
-		
 		var controllerLoading = "\tstatic var tmp = HailsDispatcher.initControllers([";
 		var first = true;
 		for (className in controllers) {
@@ -88,106 +82,22 @@ class HailsBuilder
 		RunScript.runCommand(workPath, "haxe", haxeArgs);
 	}*/
 	
-	
-	public static function buildNeko(hailsPath:String, workPath:String, args:Array<String>, unitTest:Bool=false) {
-		createWebAppHx(hailsPath, workPath);
-		RunScript.removeDirectory("nekoout");
-		RunScript.mkdir("nekoout");
-		var dest = "./nekoout";
-		var destNekoFile = "./nekoout/index.n";
-		var main = "controller.WebApp";
-		if (unitTest) {
-			dest = "./nekoout/unittest.n";
-			main = "test.unit.TestSuite";
-		}
-		var haxeArgs = ["-neko", destNekoFile, "-main", main, "-cp", ".", "-lib", "hails"].concat(getHaxeLibArgs());
-		
-		haxeArgs.push("-resource");
-		haxeArgs.push("config/dbconfig@dbconfig");
-		
-		RunScript.runCommand(workPath, "haxe", haxeArgs);
-		
-		if (FileSystem.exists (WEB_FOLDER) && FileSystem.isDirectory (WEB_FOLDER)) {
-		} else {
-			RunScript.recursiveCopy(hailsPath + "templates/war", WEB_FOLDER);
-		}
-		
-		Sys.println("Copying from " + WEB_FOLDER + "...");
-		RunScript.recursiveCopy(WEB_FOLDER, dest, ["META-INF", "WEB-INF"], null, null, !RunScript.verbose);		
-		
-		JavascriptBuilder.build(hailsPath, workPath, dest, "nekoweb");		
-		
-		if (unitTest) {
-			Platform.println("[[[[ Unit Testing NEKO target ]]]]");
-			RunScript.runCommand(workPath, "neko", [destNekoFile]);
-		} else {
-			var nekoArgs = ["server", "-p", "2000", "-h", "localhost", "-d", "nekoout", "-rewrite"];
-			if (args.length > 2 && args[2] == "run") {
-				RunScript.runCommand(workPath, "nekotools", nekoArgs);
-			} else if (args.length > 2 && args[2] == "livetest") {
-				HailsLiveTester.runThenTest(workPath, "nekotools", nekoArgs, "http://localhost:2000/");
-			}
-		}
+	function buildJs(hailsPath:String, workPath:String, dest:String, jsDefine:String) {
+		new JavascriptBuilder().build(hailsPath, workPath, dest, jsDefine);	
 	}
-	
-	public static function buildPhp(hailsPath:String, workPath:String, args:Array<String>, unitTest:Bool=false) {
-		createWebAppHx(hailsPath, workPath);
-		var dest = "phpout";
-		RunScript.removeDirectory(dest + "/res");
-		RunScript.removeDirectory(dest + "/lib");
-		RunScript.removeDirectory(dest);
-		var main = "controller.WebApp";
-		if (unitTest) {
-			dest = "phptest";
-			main = "test.unit.TestSuite";
-		}		
-		var haxeArgs = ["-php", dest, "-main", main, "-cp", ".", "-lib", "hails"].concat(getHaxeLibArgs());
-		
-		haxeArgs.push("-resource");
-		haxeArgs.push("config/dbconfig@dbconfig.pl"); // !NB!: .pl(perl)-extension so it (usually) won't be able to load directly from webroot
-		
-		RunScript.removeDirectory(dest + "/res");
-		var code = RunScript.runCommand(workPath, "haxe", haxeArgs);
-		if (code != 0) {
-			throw "build failed: " + code;
-		}
-		
-		Sys.println("Copying resources...");
-		RunScript.recursiveCopy("view", dest + "/res/view", null, ".pl", dest + "/res/", !RunScript.verbose); // !NB!: .pl(perl)-extension so it (usually) won't be able to load directly from webroot
-		addResourceDirsPhp(dest);
-		
-		Sys.println("Copying nbproject...");
-		RunScript.recursiveCopy(hailsPath + "templates/phpnbproject", dest + "/nbproject", null, null, null, !RunScript.verbose);
-		
-		if (FileSystem.exists (WEB_FOLDER) && FileSystem.isDirectory (WEB_FOLDER)) {
-		} else {
-			RunScript.recursiveCopy(hailsPath + "templates/war", WEB_FOLDER);
-		}
-		//RunScript.removeDirectory("javaout/war");
-		
-		Sys.println("Copying from " + WEB_FOLDER + "...");
-		RunScript.recursiveCopy(WEB_FOLDER, dest, ["META-INF", "WEB-INF"], null, null, !RunScript.verbose);		
-		
-		JavascriptBuilder.build(hailsPath, workPath, dest, "phpweb");
-		
-		if (unitTest) {
-			Platform.println("[[[[ Unit Testing PHP target ]]]]");
-			RunScript.runCommand(workPath, "php", [dest + "/index.php"]);
-		} else {
-			if (args.length > 2 && args[2] == "livetest") {
-				HailsLiveTester.justTest(workPath, "http://localhost/index.php/");
-			}		
-		}
-	}
+
 	
 	private static var _haxeConfig : StringMap<String> = null;
-	public static function getHaxeConfig() {
+	public function getHaxeConfig() {
 		if (_haxeConfig == null) {
 			_haxeConfig = ConfigReader.getConfigFromFile("config/haxeconfig");
 		}
 		return _haxeConfig;
 	}
-	public static function getNeededLibs() : Array<String> {
+	public function getDbConfig() {
+		return ConfigReader.getConfigFromFile("config/dbconfig");
+	}
+	public function getNeededLibs() : Array<String> {
 		var conf = getHaxeConfig();
 		if (conf == null) {
 			return new Array<String>();
@@ -198,7 +108,7 @@ class HailsBuilder
 		}
 		return libList.split(",");
 	}
-	public static function getHaxeLibArgs() {
+	public function getHaxeLibArgs() {
 		var ret = new Array<String>();
 		for (lib in getNeededLibs()) {
 			ret.push("-lib");
@@ -206,7 +116,7 @@ class HailsBuilder
 		}
 		return ret;
 	}
-	public static function getResourceDirs() : Array<String> {
+	public function getResourceDirs() : Array<String> {
 		var conf = getHaxeConfig();
 		if (conf == null) {
 			return new Array<String>();
@@ -219,142 +129,9 @@ class HailsBuilder
 		return libList.split(";");
 	}
 	
-	static function addResourceDirsJava(workPath:String, javaHome:String, mainJar:String) {
-		for (resdir in getResourceDirs()) {
-			var lastSlash = resdir.lastIndexOf("/");
-			if (lastSlash < 0) {
-				lastSlash = resdir.lastIndexOf("\\");
-			}
-			var jarArgs = ["uvf", mainJar, resdir];
-			if (lastSlash > 0) {
-				jarArgs = ["uvf", mainJar, "-C", resdir.substr(0, lastSlash), resdir.substr(lastSlash + 1)];
-			}
-			//trace(jarArgs);
-			RunScript.runCommand(workPath, javaHome + "/bin/jar.exe", jarArgs);
-		}
-	}
-	static function addResourceDirsPhp(dest:String) {
-		for (resdir in getResourceDirs()) {
-			var lastSlash = resdir.lastIndexOf("/");
-			if (lastSlash < 0) {
-				lastSlash = resdir.lastIndexOf("\\");
-			}
-			
-			var destDir = resdir;
-			if (lastSlash > 0) {
-				destDir = resdir.substr(lastSlash + 1);
-			}
-			//RunScript.recursiveCopy("view", dest + "/res/view", null, ".pl", dest + "/res/"); // !NB!: .pl(perl)-extension so it (usually) won't be able to load directly from webroot
-			RunScript.recursiveCopy(resdir, dest + "/res/" + destDir, null, ".pl", dest + "/res/", !RunScript.verbose); // !NB!: .pl(perl)-extension so it (usually) won't be able to load directly from webroot
-		}		
-	}
 	
-	public static function buildJava(hailsPath:String, workPath:String, args:Array<String>, unitTest:Bool=false) {
-		
-		var dest = "javaout";
-		RunScript.removeDirectory(dest + "/src");
-		var main = "controller.WebApp";
-		var mainJar = dest + "/WebApp.jar";
-		if (unitTest) {
-			main = "test.unit.TestSuite";
-			mainJar = dest + "/TestSuite-Debug.jar";
-		}
-		
-		var dbconfig = ConfigReader.getConfigFromFile("config/dbconfig");
-		var dbtype = null;
-		if (dbconfig != null) {
-			dbtype = dbconfig.get("type");
-		}
-		
-		var javaHome = Sys.getEnv("JAVA_HOME");
-		if (javaHome == null) {
-			Platform.println("You must set the JAVA_HOME environment variable");
-		}
-		
-		createWebAppHx(hailsPath, workPath);
-		
-		var haxeArgs = ["-java", dest, "-main", main, "-cp", ".", "-lib", "hails"].concat(getHaxeLibArgs());
-		//var bscript = "-java javaout -main hails.Main -cp . ";
-		//bscript += " -java-lib " + hailsPath + "jar/servlet-api.jar ";
-		haxeArgs.push("-java-lib");
-		haxeArgs.push(hailsPath + "jar/servlet-api.jar");
-		
-		haxeArgs.push("-resource");
-		haxeArgs.push("config/dbconfig@dbconfig");
-		
-		if (unitTest) {
-			haxeArgs.push("-debug");
-		}
-		
-		RunScript.runCommand(workPath, "haxe", haxeArgs);
-		addResourceDirsJava(workPath, javaHome, mainJar);
-		
-		var sqlJar = null;
-		var driver = null;
-		if (dbtype != null) {
-			driver = "mysql-connector-java-5.1.31-bin.jar";
-			if (dbtype == "sqlserver") {
-				driver = "sqljdbc4.jar";
-			} else if (dbtype == "sqlite") {
-				driver = "sqlite-jdbc-3.7.2.jar";
-			}
-			sqlJar = hailsPath + "jar/" + driver;
-		}
-		
-		if (unitTest) {
-			Platform.println("[[[[ Unit Testing JAVA target ]]]]");
-			var cp = mainJar;
-			if (sqlJar != null) {
-				cp += ";" + sqlJar;
-			}
-			
-			var testArgs = ["-cp", cp, "test.unit.TestSuite"];
-			RunScript.runCommand(workPath, "java", testArgs);
-			return;
-		}
-		
-		var directory = WEB_FOLDER;
-		if (FileSystem.exists (directory) && FileSystem.isDirectory (directory)) {
-			
-		} else {
-			RunScript.recursiveCopy(hailsPath + "templates/war", directory);
-		}
-		
-		RunScript.removeDirectory("javaout/war");
-
-		Sys.println("Copying from " + WEB_FOLDER + "...");
-		RunScript.recursiveCopy(WEB_FOLDER, "javaout/war", null, null, null, !RunScript.verbose);
-
-		RunScript.recursiveCopy(hailsPath + "templates/javanbproject", "javaout/nbproject");
-		
-		
-		Platform.println("Adding views to WebApp.jar...");
-		RunScript.runCommand(workPath, javaHome + "/bin/jar.exe", ["uvf", mainJar, "view"]);
-		
-		//addResourceDirsJava(workPath, javaHome, mainJar);
-		
-		File.copy (mainJar, "javaout/war/WEB-INF/lib/WebApp.jar");
-		if (sqlJar != null) {
-			File.copy (sqlJar, "javaout/war/WEB-INF/lib/" + driver);
-		}
-		
-		JavascriptBuilder.build(hailsPath, workPath, "javaout/war", "javaweb");
-		
-		var appName = appNameFromWorkPath(workPath);
-		var warFile = "javaout/"+appName+".war";
-		Platform.println("Assembling WAR-file: " + warFile);
-		RunScript.runCommand(workPath, javaHome + "/bin/jar.exe", ["cvf", warFile, "-C", "javaout/war/", "."]);
-		
-		var jettyJar = hailsPath + "/jar/jetty-runner.jar";
-		var javaArgs = ["-jar", jettyJar, warFile];
-		if (args.length > 2 && args[2] == "run") {
-			RunScript.runCommand(workPath, javaHome + "/bin/java.exe", javaArgs);
-		} else if (args.length > 2 && args[2] == "livetest") {
-			HailsLiveTester.runThenTest(workPath, javaHome + "/bin/java.exe", javaArgs, "http://localhost:8080/app/"); // +appName+"/");
-		}
-	}
 	
-	public static function appNameFromWorkPath(workPath:String) {
+	public function appNameFromWorkPath(workPath:String) {
 		var slashI = workPath.lastIndexOf("/");
 		var backslashI = workPath.lastIndexOf("\\");
 		var lastSlash = (slashI > backslashI ? slashI : backslashI);
