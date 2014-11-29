@@ -53,11 +53,17 @@ class PhpBuilder extends HailsBuilder
 			}
 		}
 		
+		if ((!hasOnly) || (only.indexOf("view") >= 0)) {
+			Sys.println("Copying views...");
+			RunScript.recursiveCopy("view", dest + "/res/view", null, ".pl", dest + "/res/", !RunScript.verbose); // !NB!: .pl(perl)-extension so it (usually) won't be able to load directly from webroot
+		}
+		
 		if ((!hasOnly) || (only.indexOf("res") >= 0)) {
 			Sys.println("Copying resources...");
-			RunScript.recursiveCopy("view", dest + "/res/view", null, ".pl", dest + "/res/", !RunScript.verbose); // !NB!: .pl(perl)-extension so it (usually) won't be able to load directly from webroot
 			addResourceDirsPhp(dest);
 		}
+		
+		
 		var webFolder = WEB_FOLDER;
 		
 		if (!hasOnly) {
