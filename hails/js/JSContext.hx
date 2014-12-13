@@ -25,4 +25,13 @@ class JSContext
 		return "/";
 	}
 	
+	public static function getStaticRootUrl() {
+		/*#if (phpweb|java
+		return "/";
+		#else
+		return getRootUrl();
+		#end*/
+		return "/";
+	}
+	
 }

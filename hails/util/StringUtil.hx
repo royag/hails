@@ -1,8 +1,4 @@
-﻿/**
-* ...
-* @author Default
-*/
-
+﻿
 package hails.util;
 
 class StringUtil {
