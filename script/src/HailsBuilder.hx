@@ -126,6 +126,11 @@ class HailsBuilder
 		}
 		return ret;
 	}
+	
+	public static function getHaxeLibArgsForBuild() {
+		return new HailsBuilder().getHaxeLibArgs();
+	}
+	
 	public function getResourceDirs() : Array<String> {
 		var conf = getHaxeConfig();
 		if (conf == null) {

@@ -52,7 +52,9 @@ class HailsLiveTester
 	}
 	
 	static function buildLiveTests(workPath:String) : Int {
+		var haxeLibArgs = HailsBuilder.getHaxeLibArgsForBuild();
 		var haxeArgs = ["-neko", "livetest.n", "-main", "test.integration.TestSuite", "-cp", ".", "-lib", "hails"];
+		haxeArgs = haxeArgs.concat(haxeLibArgs);
 		return RunScript.runCommand(workPath, "haxe", haxeArgs);
 	}
 	static function runLiveTests(workPath:String, baseUrl:String) {
