@@ -118,6 +118,17 @@ class HailsBuilder
 		}
 		return libList.split(",");
 	}
+	public function getNeededJavaLibs() : Array<String> {
+		var conf = getHaxeConfig();
+		if (conf == null) {
+			return new Array<String>();
+		}
+		var libList = conf.get("javalibs");
+		if ((libList == null) || (libList.length == 0)) {
+			return new Array<String>();
+		}
+		return libList.split(",");
+	}	
 	public function getHaxeLibArgs() {
 		var ret = new Array<String>();
 		for (lib in getNeededLibs()) {
@@ -126,6 +137,14 @@ class HailsBuilder
 		}
 		return ret;
 	}
+	public function getJavaLibArgs() {
+		var ret = new Array<String>();
+		for (lib in getNeededJavaLibs()) {
+			ret.push("-java-lib");
+			ret.push(lib);
+		}
+		return ret;
+	}	
 	
 	public static function getHaxeLibArgsForBuild() {
 		return new HailsBuilder().getHaxeLibArgs();

@@ -52,7 +52,9 @@ class JavaBuilder extends HailsBuilder
 		
 		createWebAppHx(hailsPath, workPath);
 		
-		var haxeArgs = ["-java", dest, "-main", main, "-cp", ".", "-lib", "hails"].concat(getHaxeLibArgs());
+		var haxeArgs = ["-java", dest, "-main", main, "-cp", ".", "-lib", "hails"]
+			.concat(getHaxeLibArgs())
+			.concat(getJavaLibArgs());
 		//var bscript = "-java javaout -main hails.Main -cp . ";
 		//bscript += " -java-lib " + hailsPath + "jar/servlet-api.jar ";
 		haxeArgs.push("-java-lib");
