@@ -105,6 +105,11 @@ class PhpWebContext implements IWebContext
 	public function getClientHeader(key:String) : String {
 		return Web.getClientHeader(key);
 	}
-
+	
+	public function sessionRegenerateId() : Void {
+		#if php
+		untyped __call__("session_regenerate_id", true);
+		#end
+	}
 	
 }

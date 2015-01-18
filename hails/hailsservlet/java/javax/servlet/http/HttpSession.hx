@@ -9,4 +9,5 @@ extern interface HttpSession
 {
 	@:overload public function getAttribute(name:String) : Dynamic;
 	@:overload public function setAttribute(name:String, value:Dynamic) : Void; 
+	@:overload public function invalidate() : Void;
 }

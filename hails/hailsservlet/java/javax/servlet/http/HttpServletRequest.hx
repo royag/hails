@@ -15,6 +15,7 @@ extern class HttpServletRequest
 	@:overload public function getQueryString() : String;
 	
 	@:overload public function getSession() : HttpSession;
+	@:overload public function getSession(create:Bool) : HttpSession;
 	
 	@:overload public function getRequestURI() : String;
 	

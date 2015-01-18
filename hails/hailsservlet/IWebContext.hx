@@ -28,4 +28,5 @@ interface IWebContext
 	public function setSession(key:String, value:Dynamic) : Void;
 	public function getSession(key:String) : Dynamic;
 	public function getClientHeader(key:String) : String;
+	public function sessionRegenerateId() : Void;
 }

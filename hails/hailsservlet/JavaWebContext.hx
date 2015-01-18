@@ -160,6 +160,11 @@ class JavaWebContext implements IWebContext
 	}
 	public function getClientHeader(key:String) : String {
 		return request.getHeader(key);
-	}	
+	}
+	
+	public function sessionRegenerateId() : Void {
+		request.getSession().invalidate();
+		request.getSession(true);
+	}
 	
 }
