@@ -205,9 +205,9 @@ class HailsBaseController {
 		WebCtx.print(outputData);
 	}
 	
-	function renderJson(d:Dynamic) {
+	function renderJson(d:Dynamic, replacer:Dynamic->Dynamic->Dynamic = null) {
 		getContext().setContentType("application/json");
-		renderRaw(Json.stringify(d));
+		renderRaw(Json.stringify(d, replacer));
 	}
 	
 	function renderJsonPreformatted(s:String) {

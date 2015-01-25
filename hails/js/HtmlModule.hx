@@ -1,6 +1,7 @@
 package hails.js;
 import hails.js.JSContext;
 import hails.util.StringUtil;
+import haxe.ds.StringMap;
 import haxe.rtti.Meta;
 import jQuery.JQueryStatic;
 import jQuery.JQuery;
@@ -40,6 +41,7 @@ class HtmlModule
 	
 	private static var baseHtmlFolder = "";
 	
+	private static var loadedModules = new Array<HtmlModule>();
 
 	public function new(injectAtSelector:String = null, onloaded:Void->Void = null) 
 	{
@@ -50,8 +52,10 @@ class HtmlModule
 		this.html = null;
 		this.injectAtSelector = injectAtSelector;
 		this.onloaded = onloaded;
+		loadedModules.push(this);
 		initiate();
-	}	
+	}
+
 	
 	public static function setBaseHtmlFolder(folder:String) {
 		var f = folder;
@@ -232,6 +236,34 @@ class HtmlModule
 			return data.substr(versionStringLength + 1);
 		}
 		return null;
+	}
+	
+	public static function handleHashChanged(hash:String) {
+		var commandParams = hash.split("?");
+		var command = commandParams[0];
+		while (StringTools.startsWith(command, "#")) {
+			command = command.substr(1);
+		}
+		while (StringTools.startsWith(command, "!")) {
+			command = command.substr(1);
+		}
+		var paramMap = new StringMap<String>();
+		if (commandParams.length > 1) {
+			var params = commandParams[1];
+			var paramPairs = params.split("&");
+			for (pair in paramPairs) {
+				var keyVal = pair.split("=");
+				paramMap.set(keyVal[0], keyVal[1]);
+			}
+		}
+		trace("command=" + command);
+		trace("params=" + Std.string(paramMap));
+		for (mod in loadedModules) {
+			mod.handleNavigation(command, paramMap);
+		}
+	}
+	
+	public function handleNavigation(command:String, params:StringMap<String>) {
 	}
 	
 	/////// helper methods:
