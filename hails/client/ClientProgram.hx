@@ -51,9 +51,10 @@ typedef ClientProgram = ClientProgramJS;
 #else
 import hails.client.handler.ClientProgramServer;
 import hails.client.handler.ServerHtmlElement;
-import hails.client.handler.ServerQueryStatic;
+//import hails.client.handler.ServerQueryStatic;
 import hails.client.handler.ServerQuery;
 import hails.client.ModuleMaster;
+import hails.client.handler.ServerCanvasRenderingContext;
 
 typedef JqXHR = Dynamic; // jQuery.JqXHR;
 //typedef JQueryStatic = ServerQueryStatic;
