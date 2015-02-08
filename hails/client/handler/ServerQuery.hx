@@ -96,10 +96,21 @@ class ServerQuery
 	}
 	
 	public function html(content:String = null) {
+		//trace("HTML");
 		if (content == null) {
 			return ""; // get content
+		} else {
+			empty();
+			for (n in nodes) {
+				if (StringTools.startsWith(content, "<")) {
+					n.addChild(Xml.createElement(content));
+				} else {
+					n.addChild(Xml.createPCData(content));
+				}
+				//trace(master.xml);
+			}
 		}
-		return ""; // set content
+		return content; // set content
 	}
 	
 	public function find(what:String) : ServerQuery {
@@ -119,7 +130,11 @@ class ServerQuery
 	}
 	
 	public function empty() {
-		
+		for (n in nodes) {
+			for (c in n.iterator()) {
+				n.removeChild(c);
+			}
+		}
 	}
 	
 	public function click(handler:Dynamic->Void) {
