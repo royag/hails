@@ -73,6 +73,10 @@ class ClientProgramJS
 	
 	public inline function post(url:String, data:Dynamic, callback:Dynamic->String->JqXHR->Void) : JqXHR {
 		return JQueryStatic.post(url, data, callback);
-	}	
+	}
+	
+	public inline function jquery(query:Dynamic) : JQuery {
+		return new JQuery(query);
+	}
 	
 }
