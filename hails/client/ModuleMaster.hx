@@ -11,9 +11,23 @@ class ModuleMaster
 	
 	public var loadedModules = new Array<HtmlModule>();
 	
+	var goToPageHandler:String->String->Void = null;
+	
 	public function new() 
 	{
 		
+	}
+	
+	public function setGoToPageHandler(handler:String->String->Void) {
+		goToPageHandler = handler;
+	}
+	
+	public function goToPage(pageId:String, pageContent:String = null) {
+		if (goToPageHandler != null) {
+			goToPageHandler(pageId, pageContent);
+		} else {
+			trace("Missing goToPageHandler");
+		}
 	}
 	
 	public function setBaseHtmlFolder(folder:String) {

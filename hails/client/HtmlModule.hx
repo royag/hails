@@ -53,6 +53,10 @@ class HtmlModule extends ClientProgram
 		initiate();
 	}
 	
+	public function goToPage(pageId:String, pageContent:String = null) {
+		master.goToPage(pageId, pageContent);
+	}
+	
 	function module < T : HtmlModule > (moduleClass:Class<T>) : T {
 		return master.module(moduleClass);
 	}
