@@ -64,13 +64,13 @@ class ClientProgramServer
 	
 	public inline function get(url:String, data:Dynamic, callback:Dynamic->String->Dynamic->Void) : Dynamic {
 		//return JQueryStatic.get(url, data, callback);
-		callback( { }, "200", { } );
+		callback( ["dummy","dummy", "data"], "200", { } );
 		return { };
 	}
 	
 	public inline function post(url:String, data:Dynamic, callback:Dynamic->String->Dynamic->Void) : Dynamic {
 		//return JQueryStatic.post(url, data, callback);
-		callback( { }, "200", {});
+		callback( ["dummy","dummy", "data"], "200", {});
 		return { };
 	}
 	
