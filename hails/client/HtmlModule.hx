@@ -6,7 +6,7 @@ import haxe.rtti.Meta;
 #if js
 import js.Browser;
 #end
-import hails.client.handler.HtmlHandler;
+import hails.client.ClientProgram;
 
 /**
  * To use this, you must first install the jqueryextern library:
@@ -129,7 +129,7 @@ class HtmlModule extends ClientProgram
 				}
 			}
 		}
-		JQueryStatic.get(getHtmlPath(), null, function(data:Dynamic, status:String, jqhxr:JqXHR) {
+		get(getHtmlPath(), null, function(data:Dynamic, status:String, jqhxr:JqXHR) {
 			this.loading = false;
 			this.html = data;
 			if (cacheInLocalStorage()) {
