@@ -3,10 +3,10 @@ import hails.client.JSContext;
 import hails.util.StringUtil;
 import haxe.ds.StringMap;
 import haxe.rtti.Meta;
-import jQuery.JQueryStatic;
-import jQuery.JQuery;
-import jQuery.JqXHR;
+#if js
 import js.Browser;
+#end
+import hails.client.handler.HtmlHandler;
 
 /**
  * To use this, you must first install the jqueryextern library:
@@ -135,7 +135,7 @@ class HtmlModule
 				}
 			}
 		}
-		JQueryStatic.get(getHtmlPath(), null, function(data:Dynamic, status:String, hxr:JqXHR) {
+		JQueryStatic.get(getHtmlPath(), null, function(data:Dynamic, status:String, jqhxr:JqXHR) {
 			this.loading = false;
 			this.html = data;
 			if (cacheInLocalStorage()) {
@@ -218,12 +218,15 @@ class HtmlModule
 	}
 	
 	private function saveToLocalStorage(htmlData:String) {
+		#if js
 		var key = getHtmlPath();
 		var storage = Browser.getLocalStorage();
 		storage.setItem(key, getVersion() + "!" + htmlData);
+		#end
 	}
 	
 	private function getHtmlFromLocalStorage() {
+		#if js
 		var key = getHtmlPath();
 		var storage = Browser.getLocalStorage();
 		var data = storage.getItem(key);
@@ -235,6 +238,7 @@ class HtmlModule
 		if (version == getVersion()) {
 			return data.substr(versionStringLength + 1);
 		}
+		#end
 		return null;
 	}
 	
