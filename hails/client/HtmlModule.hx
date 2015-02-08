@@ -269,8 +269,10 @@ class HtmlModule extends ClientProgram
 	}
 	
 	/////// helper methods:
+	#if js
 	public static inline function JQueryThis() : JQuery {
 		return new JQuery(untyped __js__("this"));
-	}		
+	}
+	#end
 	
 }
