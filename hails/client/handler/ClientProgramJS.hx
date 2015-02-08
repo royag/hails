@@ -51,8 +51,15 @@ class ClientProgramJS
 	public var document(get, null):Document;
 	public var window(get, null):DOMWindow;
 	
-	public function new() 
+	var master:ModuleMaster;
+	
+	public function new(master:ModuleMaster = null) 
 	{
+		if (master == null) {
+			this.master = createModuleMaster();
+		} else {
+			this.master = master;
+		}
 	}
 	
 	inline function get_document() {
@@ -77,6 +84,10 @@ class ClientProgramJS
 	
 	public inline function jquery(query:Dynamic) : JQuery {
 		return new JQuery(query);
+	}
+	
+	public inline function jqueryOnReady(runner:Void->Void) {
+		jquery(runner);
 	}
 	
 }

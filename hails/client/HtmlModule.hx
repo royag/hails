@@ -36,11 +36,10 @@ class HtmlModule extends ClientProgram
 	private var injectAtSelector:String = null;
 	private var onloaded:Void->Void = null;
 	
-	var master:ModuleMaster;
-
 	public function new(master:ModuleMaster, injectAtSelector:String = null, onloaded:Void->Void = null) 
 	{
-		super();
+		super(master);
+		trace("constructing: " + Type.getClassName(Type.getClass(this)));
 		this.master = master;
 		this.loaded = false;
 		this.loading = false;
@@ -122,6 +121,7 @@ class HtmlModule extends ClientProgram
 	
 	private function doLoadHtml(callback:Void->Void = null) {
 		this.loading = true;
+		trace("cacheInLocalStorage()=" + cacheInLocalStorage());
 		if (cacheInLocalStorage()) {
 			var cache = getHtmlFromLocalStorage();
 			if (cache != null) {
@@ -133,6 +133,7 @@ class HtmlModule extends ClientProgram
 				}
 			}
 		}
+		trace("doLoadHtml:" + getHtmlPath());
 		get(getHtmlPath(), null, function(data:Dynamic, status:String, jqhxr:JqXHR) {
 			this.loading = false;
 			this.html = data;
@@ -173,7 +174,7 @@ class HtmlModule extends ClientProgram
 		this.injecting = true;
 		var count = 0;
 		for (injectionPlace in injectAt) {
-			var jq = new JQuery(injectionPlace);
+			var jq = jquery(injectionPlace);
 			if (jq.length > 0) {
 				jq.html(html);
 				count++;
@@ -241,28 +242,7 @@ class HtmlModule extends ClientProgram
 	}
 	
 	public function handleHashChanged(hash:String) {
-		var commandParams = hash.split("?");
-		var command = commandParams[0];
-		while (StringTools.startsWith(command, "#")) {
-			command = command.substr(1);
-		}
-		while (StringTools.startsWith(command, "!")) {
-			command = command.substr(1);
-		}
-		var paramMap = new StringMap<String>();
-		if (commandParams.length > 1) {
-			var params = commandParams[1];
-			var paramPairs = params.split("&");
-			for (pair in paramPairs) {
-				var keyVal = pair.split("=");
-				paramMap.set(keyVal[0], keyVal[1]);
-			}
-		}
-		trace("command=" + command);
-		trace("params=" + Std.string(paramMap));
-		for (mod in master.loadedModules) {
-			mod.handleNavigation(command, paramMap);
-		}
+		master.handleHashChanged(hash);
 	}
 	
 	public function handleNavigation(command:String, params:StringMap<String>) {

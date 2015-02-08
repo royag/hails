@@ -113,6 +113,7 @@ class HailsBaseController {
 	}
 	
 	private function getHtml(fileName:String, ?vars:Dynamic, ?layout:String, ?callBacks:Dynamic) : String {
+		//trace("GETVIEW:" + fileName);
 		var content:String = getViewContent(fileName);
 		var t = new Template(content);
 		var contentHtml = t.execute(vars, callBacks);

@@ -1,6 +1,7 @@
 package hails.client.handler;
 
 import hails.client.ModuleMaster;
+import hails.client.handler.ServerModuleMaster;
 
 /*typedef JqXHR = Dynamic; // jQuery.JqXHR;
 typedef JQueryStatic = ServerQueryStatic;
@@ -44,8 +45,15 @@ class ClientProgramServer
 	public var document(get, null):ServerDocument;
 	public var window(get, null):Dynamic;
 	
-	public function new() 
+	var master:ModuleMaster;
+	
+	public function new(master:ModuleMaster = null) 
 	{
+		if (master == null) {
+			this.master = createModuleMaster();
+		} else {
+			this.master = master;
+		}
 	}
 	
 	function get_document() {
@@ -59,24 +67,32 @@ class ClientProgramServer
 	}	
 	
 	public function createModuleMaster() {
-		return new ModuleMaster();
+		return new ServerModuleMaster();
+	}
+	
+	public function getServerModuleMaster() : ServerModuleMaster {
+		return cast(master);
 	}
 	
 	public inline function get(url:String, data:Dynamic, callback:Dynamic->String->Dynamic->Void) : Dynamic {
 		//return JQueryStatic.get(url, data, callback);
+		trace("GET: " + url);
 		callback( ["dummy","dummy", "data"], "200", { } );
 		return { };
 	}
 	
 	public inline function post(url:String, data:Dynamic, callback:Dynamic->String->Dynamic->Void) : Dynamic {
 		//return JQueryStatic.post(url, data, callback);
+		trace("POST: " + url);
 		callback( ["dummy","dummy", "data"], "200", {});
 		return { };
 	}
-	
+	public inline function jqueryOnReady(runner:Void->Void) {
+		runner();
+	}
 	public inline function jquery(query:Dynamic) : ServerQuery {
 		//return new JQuery(query);
-		return new ServerQuery(query);
+		return new ServerQuery(query, getServerModuleMaster());
 	}
 	
 }

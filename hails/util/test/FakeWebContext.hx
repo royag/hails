@@ -54,9 +54,13 @@ class FakeWebContext implements IWebContext
 	}
 	public function printBinary(s:Blob) : Void {
 	}
+	public var outputString:String = "";
+	
 	public function print(s:String) : Void {
+		outputString += s;
 	}
 	public function println(s:String) : Void {
+		outputString += s + "\n";
 	}
 	public var URI:String;
 	public function getURI() : String {
@@ -77,4 +81,6 @@ class FakeWebContext implements IWebContext
 	public function getClientHeader(key:String) : String {
 		return this.clientHeaders.get(key);
 	}
+	public function sessionRegenerateId() : Void {
+	}	
 }

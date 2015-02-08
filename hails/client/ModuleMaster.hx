@@ -1,5 +1,6 @@
 package hails.client;
 
+import haxe.ds.StringMap;
 
 class ModuleMaster
 {
@@ -56,5 +57,31 @@ class ModuleMaster
 		}
 		return null;
 	}
+	
+	public function handleHashChanged(hash:String) {
+		var commandParams = hash.split("?");
+		var command = commandParams[0];
+		while (StringTools.startsWith(command, "#")) {
+			command = command.substr(1);
+		}
+		while (StringTools.startsWith(command, "!")) {
+			command = command.substr(1);
+		}
+		var paramMap = new StringMap<String>();
+		if (commandParams.length > 1) {
+			var params = commandParams[1];
+			var paramPairs = params.split("&");
+			for (pair in paramPairs) {
+				var keyVal = pair.split("=");
+				paramMap.set(keyVal[0], keyVal[1]);
+			}
+		}
+		trace("command=" + command);
+		trace("params=" + Std.string(paramMap));
+		trace("loadedModules.length=" + loadedModules.length);
+		for (mod in loadedModules) {
+			mod.handleNavigation(command, paramMap);
+		}
+	}	
 	
 }
