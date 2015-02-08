@@ -43,7 +43,6 @@ typedef TableCellElement =  js.html.TableCellElement;
 typedef TableColElement =  js.html.TableColElement;
 typedef TableElement =  js.html.TableElement;
 typedef TableRowElement =  js.html.TableRowElement;
-typedef Browser = js.Browser;
 
 #else
 // Server side definitions:
@@ -68,7 +67,6 @@ typedef TableCellElement = ServerHtmlElement;
 typedef TableColElement =  ServerHtmlElement;
 typedef TableElement =  ServerHtmlElement;
 typedef TableRowElement =  ServerHtmlElement;
-typedef Browser = ServerBrowser;
 
 #end
 

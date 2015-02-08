@@ -13,4 +13,20 @@ class ServerQuery
 		
 	}
 	
+	public function show() {
+		
+	}
+	
+	public function hide() {
+		
+	}
+	
+	var thevalue:Dynamic = null;
+	public function val(v:Dynamic = null) : Dynamic {
+		if (v != null) {
+			thevalue = v;
+		}
+		return thevalue;
+	}
+	
 }

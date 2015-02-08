@@ -26,7 +26,7 @@ import hails.client.handler.HtmlHandler;
  * When you update the HTML you can specify on your HtmlModule-class: @version("2")
  * If this version differs from what is in the cache, the cache will be updated.
  */
-class HtmlModule
+class HtmlModule extends ClientProgram
 {
 	public var loaded(default, null) : Bool;
 	public var loading(default, null) : Bool;
@@ -36,15 +36,12 @@ class HtmlModule
 	private var injectAtSelector:String = null;
 	private var onloaded:Void->Void = null;
 	
-	private static var pendingInjections = new Array<HtmlModule>();
-	private static var cacheInLocalStorageAsDefault = false;
-	
-	private static var baseHtmlFolder = "";
-	
-	private static var loadedModules = new Array<HtmlModule>();
+	var master:ModuleMaster;
 
-	public function new(injectAtSelector:String = null, onloaded:Void->Void = null) 
+	public function new(master:ModuleMaster, injectAtSelector:String = null, onloaded:Void->Void = null) 
 	{
+		super();
+		this.master = master;
 		this.loaded = false;
 		this.loading = false;
 		this.injected = false;
@@ -52,27 +49,24 @@ class HtmlModule
 		this.html = null;
 		this.injectAtSelector = injectAtSelector;
 		this.onloaded = onloaded;
-		loadedModules.push(this);
+		master.loadedModules.push(this);
 		initiate();
+	}
+	
+	function module < T : HtmlModule > (moduleClass:Class<T>) : T {
+		return master.module(moduleClass);
 	}
 
 	
-	public static function setBaseHtmlFolder(folder:String) {
-		var f = folder;
-		if (StringTools.startsWith(f, "/")) {
-			f = f.substr(1);
-		}
-		if (!StringTools.endsWith(f, "/")) {
-			f = f + "/";
-		}
-		baseHtmlFolder = f;
+	public function setBaseHtmlFolder(folder:String) {
+		master.setBaseHtmlFolder(folder);
 	}
 	
-	public static function setCacheInLocalStorageAsDefault(cache:Bool) {
-		cacheInLocalStorageAsDefault = cache;
+	public function setCacheInLocalStorageAsDefault(cache:Bool) {
+		master.cacheInLocalStorageAsDefault = cache;
 	}
 	public function cacheInLocalStorage() : Bool {
-		return cacheInLocalStorageAsDefault;
+		return master.cacheInLocalStorageAsDefault;
 	}
 
 	
@@ -104,7 +98,7 @@ class HtmlModule
 			relPath = relPath.substr(1);
 		}
 
-		return JSContext.getStaticRootUrl() + baseHtmlFolder + relPath + (includeVersion ? "?v=" + getVersion() : "");
+		return JSContext.getStaticRootUrl() + master.baseHtmlFolder + relPath + (includeVersion ? "?v=" + getVersion() : "");
 	}
 
 	private function initiate() {
@@ -115,7 +109,7 @@ class HtmlModule
 	 * Retry any modules that could not be injected, because maybe they depend on "this"
 	 */
 	private function retryOtherPendingModules() {
-		for (mod in pendingInjections) {
+		for (mod in master.pendingInjections) {
 			if (!mod.injecting) {
 				mod.doInject();
 			}
@@ -183,13 +177,13 @@ class HtmlModule
 		}
 		if (count == 0) {
 			trace("no injection-point found for " + Std.string(injectAt));
-			if (pendingInjections.indexOf(this) < 0) {
-				pendingInjections.push(this);
+			if (master.pendingInjections.indexOf(this) < 0) {
+				master.pendingInjections.push(this);
 			}
 		} else {
 			this.injected = true;
-			if (pendingInjections.indexOf(this) >= 0) {
-				pendingInjections.remove(this);
+			if (master.pendingInjections.indexOf(this) >= 0) {
+				master.pendingInjections.remove(this);
 			}
 			callOnLoaded();
 			retryOtherPendingModules();
@@ -242,7 +236,7 @@ class HtmlModule
 		return null;
 	}
 	
-	public static function handleHashChanged(hash:String) {
+	public function handleHashChanged(hash:String) {
 		var commandParams = hash.split("?");
 		var command = commandParams[0];
 		while (StringTools.startsWith(command, "#")) {
@@ -262,7 +256,7 @@ class HtmlModule
 		}
 		trace("command=" + command);
 		trace("params=" + Std.string(paramMap));
-		for (mod in loadedModules) {
+		for (mod in master.loadedModules) {
 			mod.handleNavigation(command, paramMap);
 		}
 	}
