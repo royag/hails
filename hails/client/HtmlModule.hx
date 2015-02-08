@@ -1,5 +1,5 @@
-package hails.js;
-import hails.js.JSContext;
+package hails.client ;
+import hails.client.JSContext;
 import hails.util.StringUtil;
 import haxe.ds.StringMap;
 import haxe.rtti.Meta;

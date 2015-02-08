@@ -1,4 +1,4 @@
-package hails.js;
+package hails.client ;
 
 /**
  * ...
