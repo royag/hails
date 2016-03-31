@@ -12,5 +12,6 @@ Note that Hails is in a alpha-state, and is not production-ready for the public.
 Getting started with a simple database-enabled web application however, on any of the three targets, is very easy:
 
 See Getting started
+https://code.google.com/archive/p/hails/wikis/GettingStarted.wiki
 
 License note: Please note that it is the haxe source code for Hails that is covered by the MIT License, not the 3rd party Java libraries that are provided for convenience and might be covered by different licenses.
